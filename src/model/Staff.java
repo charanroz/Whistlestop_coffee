@@ -1,3 +1,5 @@
+package model;
+
 public class Staff {
     private int id;
     private String name;
@@ -9,6 +11,10 @@ public class Staff {
         this.name = name;
         this.email = email;
         this.password = password;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getEmail(){

@@ -1,3 +1,6 @@
+package service;
+
+import model.Staff;
 import java.util.List;
 
 public class LoginManager {
