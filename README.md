@@ -1,8 +1,8 @@
-# Whistlestop Coffee System – Development Flow
+# Whistlestop Coffee Ordering System – Team Development Guide
 
 ## 1. Project Goal
 
-The goal of this project is to build a system that allows customers to **order coffee in advance from a kiosk at Cramlington Station**. Customers will place orders using a mobile/web interface, and staff will manage the orders through a staff dashboard.
+The goal of this project is to build a system that allows customers to **order coffee in advance** from the Whistlestop kiosk at Cramlington Station. Customers place orders through a web/mobile interface and staff manage the orders through a staff dashboard.
 
 ---
 
@@ -10,7 +10,16 @@ The goal of this project is to build a system that allows customers to **order c
 
 ## Stage 1 – Core Java Logic (Current Stage)
 
-At this stage we are building the **core backend logic using Java classes only**. No APIs or frameworks yet.
+We are currently building the **core system logic using plain Java classes** before introducing frameworks.
+
+At this stage we are:
+
+* Designing system classes
+* Defining attributes and methods
+* Organizing packages
+* Simulating system behaviour
+
+No APIs, frameworks, or databases are used yet.
 
 ### Package Structure
 
@@ -21,12 +30,13 @@ Examples:
 
 * Staff
 * Customer
-* Order
 * MenuItem
+* Order
+* OrderItem
 * Payment
 
 service
-Contains logic that manages the models.
+Contains classes implementing system logic.
 
 Examples:
 
@@ -35,16 +45,11 @@ Examples:
 * MenuManager
 * PaymentManager
 
-### Goal of This Stage
-
-* Design system classes
-* Define attributes and methods
-* Simulate how the system works using a main class
-* Ensure all components interact correctly
+Service classes will use the model classes.
 
 ---
 
-# 3. System Components
+# 3. Core System Models
 
 ## Staff
 
@@ -54,54 +59,56 @@ Responsibilities:
 
 * Log into the system
 * View incoming orders
+* Accept or reject orders
 * Update order status
-* Cancel orders
-* Manage completed orders
+* Mark orders as ready or collected
+* Cancel orders when necessary
 
 ---
 
 ## Customer
 
-Represents a user ordering coffee.
+Represents a user placing an order.
 
 Responsibilities:
 
-* Browse menu
+* Browse the coffee menu
+* Select items
 * Place orders
-* Select pickup time
-* Pay for orders
-* View order status
+* Choose pickup time
+* Pay for the order
+* Check order status
 
 ---
 
-## Menu
+## MenuItem
 
-Stores available coffee items.
+Represents a drink available on the menu.
 
-Example information:
+Information includes:
 
-* Coffee name
+* Item name
 * Description
 * Price
 * Availability
 
-Customers will browse the menu before placing an order.
+Customers select menu items when placing orders.
 
 ---
 
 ## Order
 
-Represents a coffee order placed by a customer.
+Represents a full order placed by a customer.
 
-Order includes:
+An order contains:
 
 * Order ID
-* Coffee item(s)
-* Quantity
+* Customer
 * Pickup time
 * Order status
+* List of ordered items (OrderItem)
 
-Order status can be:
+Order statuses may include:
 
 * Pending
 * Accepted
@@ -112,15 +119,38 @@ Order status can be:
 
 ---
 
+## OrderItem
+
+Represents a single item within an order.
+
+An order can contain multiple items.
+Each OrderItem includes:
+
+* Menu item
+* Quantity
+
+Example:
+
+Order #102
+
+* Latte ×2
+* Cappuccino ×1
+
+Each drink entry is an OrderItem.
+
+This design keeps the system flexible and allows customers to order multiple drinks in a single order.
+
+---
+
 ## Payment
 
-Handles payment processing for orders.
+Handles payment information for an order.
 
 Responsibilities:
 
 * Store payment details
 * Confirm payment
-* Mark order as paid
+* Link payment to the order
 
 ---
 
@@ -129,26 +159,27 @@ Responsibilities:
 ## Customer Flow
 
 1. Customer opens the application.
-2. Customer browses the available coffee menu.
-3. Customer selects coffee and quantity.
-4. Customer chooses a pickup time.
-5. Customer confirms the order.
-6. Customer completes payment.
-7. Order is saved in the system.
-8. Customer can view order status updates.
+2. Customer browses the coffee menu.
+3. Customer selects one or more menu items.
+4. Items are added to an order.
+5. Customer chooses a pickup time.
+6. Customer confirms the order.
+7. Customer completes payment.
+8. Order is saved in the system.
+9. Customer can view order status updates.
 
 ---
 
 ## Staff Flow
 
 1. Staff logs into the system.
-2. Staff views incoming orders on a dashboard.
+2. Staff views incoming orders.
 3. Staff accepts the order.
-4. Staff prepares the order.
-5. Staff marks the order as ready.
+4. Staff prepares the drinks.
+5. Staff marks the order as **ready for collection**.
 6. Customer collects the order.
-7. Staff marks the order as collected.
-8. Completed orders move to archive.
+7. Staff marks the order as **collected**.
+8. Completed orders move to an archive.
 
 ---
 
@@ -163,7 +194,7 @@ The frontend will communicate with the backend using **REST APIs**.
 
 ### Customer Interface
 
-Pages may include:
+Possible pages:
 
 * Home page
 * Menu page
@@ -173,23 +204,23 @@ Pages may include:
 
 ### Staff Interface
 
-Pages may include:
+Possible pages:
 
 * Staff login
 * Order dashboard
-* Order status update
+* Order status update page
 * Completed orders archive
 
 ---
 
 # 6. Backend Plan (Spring Boot Phase)
 
-After finishing core Java classes, we will move to **Spring Boot**.
+After completing the core Java logic, we will integrate **Spring Boot**.
 
 The backend structure will include:
 
 controller
-Handles API requests from the frontend.
+Handles API requests.
 
 service
 Contains business logic.
@@ -218,8 +249,9 @@ model
 
 * Staff
 * Customer
-* Order
 * MenuItem
+* Order
+* OrderItem
 * Payment
 
 repository
@@ -231,7 +263,7 @@ repository
 
 # 7. Frontend ↔ Backend Communication
 
-React frontend will call backend APIs such as:
+The React frontend will call backend APIs such as:
 
 POST /login
 Staff login
@@ -250,42 +282,45 @@ Update order status
 
 ---
 
-# 8. Database
+# 8. Database (Later Phase)
 
 The database will store:
 
-Staff
-Customer
-Orders
-Menu items
-Payments
+* Staff
+* Customers
+* Menu items
+* Orders
+* Order items
+* Payments
 
-The backend will communicate with the database using **Spring Data JPA**.
+Spring Boot will use **Spring Data JPA** to interact with the database.
 
 ---
 
 # 9. Final System Flow
 
-Customer (React App)
+Customer (React Frontend)
 ↓
-Calls Backend API (Spring Boot)
+API Request
 ↓
-Backend Processes Logic (Services)
+Spring Boot Backend
 ↓
-Data Stored / Retrieved from Database
+Service Logic
 ↓
-Response sent back to frontend
+Database
 ↓
-Frontend updates UI
+Response to Frontend
+↓
+UI Updates
 
 ---
 
-# 10. Next Steps for the Team
+# 10. Next Steps
 
-1. Complete Java model and service classes.
+1. Complete model and service classes.
 2. Test system logic locally.
 3. Learn Spring Boot basics.
 4. Convert services into REST APIs.
-5. Learn React and build frontend UI.
+5. Build the React frontend.
 6. Connect frontend with backend APIs.
 7. Add database integration.
