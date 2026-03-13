@@ -1,34 +1,30 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Order {
     private int id;
-    private String coffeeItem;
-    private int quantity;
+    private Customer customer;
     private String pickupTime;
     private String status;
     private String cancelReason;
+    private List<OrderItem> items;
 
-    public Order(int id, String coffeeItem, int quantity, String pickupTime) {
+    public Order(int id, Customer customer, String pickupTime) {
         this.id = id;
-        this.coffeeItem = coffeeItem;
-        this.quantity = quantity;
+        this.customer = customer;
         this.pickupTime = pickupTime;
         this.status = "Pending";
-
+        this.items = new ArrayList<>();
     }
 
     public int getId() {
         return id;
     }
-
-    public String getCoffeeItem() {
-        return coffeeItem;
+    public Customer getCustomer() {
+        return customer;
     }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
     public String getPickupTime() {
         return pickupTime;
     }
@@ -44,5 +40,22 @@ public class Order {
     public void setCancelReason(String reason) {
         this.cancelReason = reason;
     }
+    public List<OrderItem> getItems() {
+        return items;
+    }
 
+    public void addItem(OrderItem item) {
+        this.items.add(item);
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", customer=" + customer.getName() +
+                ", pickupTime='" + pickupTime + '\'' +
+                ", status='" + status + '\'' +
+                ", items=" + items +
+                '}';
+    }
 }
