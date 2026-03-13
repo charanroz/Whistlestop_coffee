@@ -48,6 +48,15 @@ public class Order {
         this.items.add(item);
     }
 
+
+    public double getTotalPrice() {
+        double total = 0;
+        for (OrderItem item : items) {
+            total += item.getSubtotal().doubleValue();
+        }
+        return total;
+    }
+
     @Override
     public String toString() {
         return "Order{" +
@@ -55,6 +64,7 @@ public class Order {
                 ", customer=" + customer.getName() +
                 ", pickupTime='" + pickupTime + '\'' +
                 ", status='" + status + '\'' +
+                ", totalPrice=" + getTotalPrice() +
                 ", items=" + items +
                 '}';
     }
