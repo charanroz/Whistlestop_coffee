@@ -1,49 +1,82 @@
 package service;
 
+import dto.MenuItemResponse;
 import model.MenuItem;
+import repository.MenuItemRepository;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Business logic layer for managing the Menu.
+ */
 public class MenuManager {
 
-    private List<MenuItem> menuItems = new ArrayList<>();
+    // Data access layer dependency
+    private MenuItemRepository repository = new MenuItemRepository();
 
-    public MenuManager() {
-        loadDefaultMenu();
-    }
-
-    private void loadDefaultMenu() {
-        menuItems.add(new MenuItem(1, "Americano", true, 1.50, 2.00));
-        menuItems.add(new MenuItem(2, "Americano with milk", true, 2.00, 2.50));
-        menuItems.add(new MenuItem(3, "Latte", true, 2.50, 3.00));
-        menuItems.add(new MenuItem(4, "Cappuccino", true, 2.50, 3.00));
-        menuItems.add(new MenuItem(5, "Hot Chocolate", true, 2.00, 2.50));
-        menuItems.add(new MenuItem(6, "Mocha", true, 2.50, 3.00));
-        // Mineral Water hasSize is false, large price is set to 0.0 but unused
-        menuItems.add(new MenuItem(7, "Mineral Water", false, 1.00, 0.00));
-    }
-
-    public List<MenuItem> getAllMenuItems() {
-        return menuItems;
-    }
-
-    public MenuItem getMenuItemById(int id) {
-        for (MenuItem item : menuItems) {
-            if (item.getId() == id) {
-                return item;
+    /**
+     * For Customers: Returns only the menu items that are currently in stock.
+     */
+    public List<MenuItemResponse> getAvailableMenu() {
+        List<MenuItemResponse> result = new ArrayList<>();
+        for (MenuItem item : repository.findActiveItems()) {
+            if (item.isAvailable()) {
+                result.add(MenuItemResponse.from(item));
             }
+        }
+        return result;
+    }
+
+    /**
+     * For Staff/Dashboard: Returns all active items, including those out of stock.
+     */
+    public List<MenuItemResponse> getFullMenu() {
+        List<MenuItemResponse> result = new ArrayList<>();
+        for (MenuItem item : repository.findActiveItems()) {
+            result.add(MenuItemResponse.from(item));
+        }
+        return result;
+    }
+
+    /**
+     * For API/Frontend: Retrieves a single item as a DTO.
+     */
+    public MenuItemResponse getById(int id) {
+        MenuItem item = repository.findById(id);
+        if (item != null) {
+            return MenuItemResponse.from(item);
         }
         return null;
     }
 
-    public void updateItemAvailability(int id, boolean isAvailable) {
-        MenuItem item = getMenuItemById(id);
+    /**
+     * IMPORTANT: For Internal Team Use (OrderManager).
+     * Order module needs the actual Entity to calculate prices and bind to orders.
+     * Do not return DTO here.
+     */
+    public MenuItem getMenuItemEntity(int id) {
+        return repository.findById(id);
+    }
+
+    /**
+     * For Staff: Mark an item as sold out or back in stock.
+     */
+    public void updateAvailability(int id, boolean available) {
+        MenuItem item = repository.findById(id);
         if (item != null) {
-            item.setAvailable(isAvailable);
+            item.setAvailable(available);
         }
     }
 
-    public void addMenuItem(MenuItem newItem) {
-        menuItems.add(newItem);
+    /**
+     * For Staff: Permanently remove an item from the menu (Soft Delete).
+     * We use soft delete to ensure past orders referencing this item do not break.
+     */
+    public void deleteMenuItem(int id) {
+        MenuItem item = repository.findById(id);
+        if (item != null) {
+            item.setDeleted(true);    // Mark as deleted
+            item.setAvailable(false); // Make it automatically out of stock
+        }
     }
 }
