@@ -1,8 +1,8 @@
-package controller;
+package com.whistlestop_coffee.whistlestop_coffee.controller;
 
-import model.Order;
-import model.OrderItem;
-import service.OrderManager;
+import com.whistlestop_coffee.whistlestop_coffee.model.Order;
+import com.whistlestop_coffee.whistlestop_coffee.model.OrderItem;
+import com.whistlestop_coffee.whistlestop_coffee.service.OrderManager;
 
 import java.util.List;
 

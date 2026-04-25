@@ -1,4 +1,4 @@
-package model;
+package com.whistlestop_coffee.whistlestop_coffee.model;
 
 /**
  * Represents a coffee or food item on the menu.

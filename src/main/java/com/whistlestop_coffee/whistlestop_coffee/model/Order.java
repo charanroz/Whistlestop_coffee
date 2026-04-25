@@ -1,4 +1,4 @@
-package model;
+package com.whistlestop_coffee.whistlestop_coffee.model;
 
 import java.util.ArrayList;
 import java.util.List;

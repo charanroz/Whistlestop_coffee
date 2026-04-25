@@ -1,6 +1,6 @@
-package service;
+package com.whistlestop_coffee.whistlestop_coffee.service;
 
-import model.Staff;
+import com.whistlestop_coffee.whistlestop_coffee.model.Staff;
 import java.util.List;
 
 public class LoginManager {

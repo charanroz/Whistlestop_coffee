@@ -1,6 +1,6 @@
-package service;
+package com.whistlestop_coffee.whistlestop_coffee.service;
 
-import model.Customer;
+import com.whistlestop_coffee.whistlestop_coffee.model.Customer;
 
 public class LoginResult {
 

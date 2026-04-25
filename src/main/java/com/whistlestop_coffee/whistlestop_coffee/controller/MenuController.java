@@ -1,7 +1,7 @@
-package controller;
+package com.whistlestop_coffee.whistlestop_coffee.controller;
 
-import dto.MenuItemResponse;
-import service.MenuManager;
+import com.whistlestop_coffee.whistlestop_coffee.dto.MenuItemResponse;
+import com.whistlestop_coffee.whistlestop_coffee.service.MenuManager;
 import java.util.List;
 
 /**

@@ -1,4 +1,4 @@
-package model;
+package com.whistlestop_coffee.whistlestop_coffee.model;
 
 public class Staff {
     private int id;

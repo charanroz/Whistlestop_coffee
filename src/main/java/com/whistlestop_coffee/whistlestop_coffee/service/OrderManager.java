@@ -1,7 +1,7 @@
-package service;
+package com.whistlestop_coffee.whistlestop_coffee.service;
 
-import model.Order;
-import model.OrderItem;
+import com.whistlestop_coffee.whistlestop_coffee.model.Order;
+import com.whistlestop_coffee.whistlestop_coffee.model.OrderItem;
 
 import java.util.ArrayList;
 import java.util.List;

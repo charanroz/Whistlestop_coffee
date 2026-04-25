@@ -1,8 +1,8 @@
-package service;
+package com.whistlestop_coffee.whistlestop_coffee.service;
 
-import dto.MenuItemResponse;
-import model.MenuItem;
-import repository.MenuItemRepository;
+import com.whistlestop_coffee.whistlestop_coffee.dto.MenuItemResponse;
+import com.whistlestop_coffee.whistlestop_coffee.model.MenuItem;
+import com.whistlestop_coffee.whistlestop_coffee.repository.MenuItemRepository;
 import java.util.ArrayList;
 import java.util.List;
 

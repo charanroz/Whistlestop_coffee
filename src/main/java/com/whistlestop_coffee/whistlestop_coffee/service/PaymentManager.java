@@ -1,6 +1,6 @@
-package service;
+package com.whistlestop_coffee.whistlestop_coffee.service;
 
-import model.Payment;
+import com.whistlestop_coffee.whistlestop_coffee.model.Payment;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
-package repository;
+package com.whistlestop_coffee.whistlestop_coffee.repository;
 
-import model.MenuItem;
+import com.whistlestop_coffee.whistlestop_coffee.model.MenuItem;
 import java.util.ArrayList;
 import java.util.List;
 
