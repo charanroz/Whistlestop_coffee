@@ -5,8 +5,8 @@ package com.whistlestop_coffee.whistlestop_coffee.service;
 import com.whistlestop_coffee.whistlestop_coffee.model.Customer;
 import com.whistlestop_coffee.whistlestop_coffee.repository.CustomerRepository;
 
-import model.Customer;
-import repository.CustomerRepository;
+import com.whistlestop_coffee.whistlestop_coffee.model.Customer;
+import com.whistlestop_coffee.whistlestop_coffee.repository.CustomerRepository;
 
 public class CustomerLoginService {
 
