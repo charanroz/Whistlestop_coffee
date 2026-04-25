@@ -1,7 +1,6 @@
 com/whistlestop_coffee/whistlestop_coffee/model/Customer.class
 com/whistlestop_coffee/whistlestop_coffee/dto/MenuItemResponse.class
 com/whistlestop_coffee/whistlestop_coffee/controller/OrderController.class
-main/java/com/whistlestop_coffee/whistlestop_coffee/SpringBootApplication.class
 com/whistlestop_coffee/whistlestop_coffee/repository/CustomerRepository.class
 com/whistlestop_coffee/whistlestop_coffee/service/LoginManager.class
 com/whistlestop_coffee/whistlestop_coffee/model/MenuItem.class
