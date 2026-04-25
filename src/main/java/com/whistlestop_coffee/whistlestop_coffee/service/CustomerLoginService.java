@@ -4,10 +4,10 @@ package com.whistlestop_coffee.whistlestop_coffee.service;
 
 import com.whistlestop_coffee.whistlestop_coffee.model.Customer;
 import com.whistlestop_coffee.whistlestop_coffee.repository.CustomerRepository;
+import org.springframework.stereotype.Service;
 
-import model.Customer;
-import repository.CustomerRepository;
 
+@Service
 public class CustomerLoginService {
 
     private CustomerRepository repository;
