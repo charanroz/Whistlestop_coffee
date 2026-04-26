@@ -2,6 +2,7 @@ package com.whistlestop_coffee.whistlestop_coffee.controller;
 
 import com.whistlestop_coffee.whistlestop_coffee.dto.MenuItemResponse;
 import com.whistlestop_coffee.whistlestop_coffee.service.MenuManager;
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 import java.util.List;
@@ -15,8 +16,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/menu")
 @CrossOrigin
 public class MenuController {
-
-    private MenuManager menuManager = new MenuManager();
+    @Autowired
+    private MenuManager menuManager;
 
     @GetMapping
     public List<MenuItemResponse> getAvailableMenu() {
