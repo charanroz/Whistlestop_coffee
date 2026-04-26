@@ -1,15 +1,29 @@
 package com.whistlestop_coffee.whistlestop_coffee.model;
 
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "orders")
 public class Order {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
     private Customer customer;
+
     private String pickupTime;
     private String status;
     private String cancelReason;
-    private List<OrderItem> items;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderItem> items = new ArrayList<>();
+
+    public Order() {}
 
     public Order(int id, Customer customer, String pickupTime) {
         this.id = id;
@@ -18,51 +32,20 @@ public class Order {
         this.status = "Pending";
         this.items = new ArrayList<>();
     }
-    // Returns the unique ID of this order
-    public int getId() {
-        return id;
-    }
-    // Returns the Customer who placed this order
-    public Customer getCustomer() {
-        return customer;
-    }
-    // Returns the pickup time selected by the customer e.g. "14:00", "14:30"
-    public String getPickupTime() {
-        return pickupTime;
-    }
-    // Returns the current status of the order
-    // Possible values: Pending, Accepted, In Progress, Ready for Collection, Collected, Cancelled
-    public String getStatus() {
-        return status;
-    }
-    // Updates the status of the order
-// Possible values: Pending, Accepted, In Progress, Ready for Collection, Collected, Cancelled
-    public void setStatus(String status) {
-        this.status = status;
-    }
-    // Returns the reason why the order was cancelled
-// Possible values: "no_show" (customer did not collect within 15 minutes)
-//                  "out_of_stock" (kiosk ran out of the ordered item)
-    public String getCancelReason() {
-        return cancelReason;
-    }
-    // Sets the reason for cancelling the order
-// Possible values: "no_show" or "out_of_stock"
-    public void setCancelReason(String reason) {
-        this.cancelReason = reason;
-    }
-    // Returns the list of all OrderItems in this order
-    public List<OrderItem> getItems() {
-        return items;
-    }
 
-    // Adds a new OrderItem to this order
+    public int getId() { return id; }
+    public Customer getCustomer() { return customer; }
+    public String getPickupTime() { return pickupTime; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public String getCancelReason() { return cancelReason; }
+    public void setCancelReason(String reason) { this.cancelReason = reason; }
+    public List<OrderItem> getItems() { return items; }
+
     public void addItem(OrderItem item) {
         this.items.add(item);
     }
 
-    // Calculates and returns the total price of all items in this order
-// Total is calculated by summing the subtotal of each OrderItem
     public double getTotalPrice() {
         double total = 0;
         for (OrderItem item : items) {
@@ -70,15 +53,6 @@ public class Order {
         }
         return total;
     }
-
-
-
-
-
-
-
-    // Returns a string representation of this order
-// Includes: id, customer name, pickupTime, status, totalPrice, items
 
     @Override
     public String toString() {

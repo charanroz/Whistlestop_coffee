@@ -1,7 +1,12 @@
 package com.whistlestop_coffee.whistlestop_coffee.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
+@Entity
 public class BusinessHour {
 
+    @Id
     private String dayOfWeek;
     private String openTime;
     private String closeTime;

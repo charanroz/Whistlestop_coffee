@@ -1,35 +1,43 @@
 package com.whistlestop_coffee.whistlestop_coffee.model;
 
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 
+@Entity
 public class OrderItem {
-    private int id;    // PK: id INT(30)
-    private int orderId;    // FK: order_id INT(30)
-    private int menuItemId;    // FK: menu_item_id INT(30)
-    private String size;    // size VAR(15) DEFAULT 'Regular'
-    private int quantity;    // quantity INT(30) DEFAULT 1
-    private BigDecimal unitPrice;    // unit_price DECIMAL(5,2)
 
-    /**
-     * Used for creating new order items
-     * Including Menu item and Quantity
-     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
+
+    @ManyToOne
+    @JoinColumn(name = "menu_item_id")
+    private MenuItem menuItem;
+
+    private String size;
+    private int quantity;
+    private BigDecimal unitPrice;
+
+    public OrderItem() {}
+
     public OrderItem(int menuItemId, String size, int quantity, BigDecimal unitPrice) {
-        this.menuItemId = menuItemId;
         this.size = (size != null) ? size : "Regular";
         this.quantity = quantity;
         this.unitPrice = unitPrice;
     }
 
-    // Getter and Setter methods
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
-    public int getOrderId() { return orderId; }
-    public void setOrderId(int orderId) { this.orderId = orderId; }
+    public Order getOrder() { return order; }
+    public void setOrder(Order order) { this.order = order; }
 
-    public int getMenuItemId() { return menuItemId; }
-    public void setMenuItemId(int menuItemId) { this.menuItemId = menuItemId; }
+    public MenuItem getMenuItem() { return menuItem; }
+    public void setMenuItem(MenuItem menuItem) { this.menuItem = menuItem; }
 
     public String getSize() { return size; }
     public void setSize(String size) { this.size = size; }
@@ -40,9 +48,6 @@ public class OrderItem {
     public BigDecimal getUnitPrice() { return unitPrice; }
     public void setUnitPrice(BigDecimal unitPrice) { this.unitPrice = unitPrice; }
 
-    /**
-     * Calculate the subtotal amount of this individual item
-     */
     public BigDecimal getSubtotal() {
         return unitPrice.multiply(new BigDecimal(quantity));
     }
@@ -50,7 +55,6 @@ public class OrderItem {
     @Override
     public String toString() {
         return "OrderItem{" +
-                "menuItemId=" + menuItemId +
                 ", size='" + size + '\'' +
                 ", quantity=" + quantity +
                 ", unitPrice=£" + unitPrice +
