@@ -31,7 +31,6 @@ public class OrderManager {
 
         for (OrderItem item : order.getItems()) {
 
-            // ✅ get ID from request
             int menuItemId = item.getMenuItemId();
 
             MenuItem menuItem = menuManager.getMenuItemEntity(menuItemId);

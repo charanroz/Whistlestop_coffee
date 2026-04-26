@@ -33,7 +33,6 @@ public class OrderItem {
 
     public OrderItem() {}
 
-    // ✅ FIXED CONSTRUCTOR
     public OrderItem(MenuItem menuItem, String size, int quantity, BigDecimal unitPrice) {
         this.menuItem = menuItem;
         this.size = (size != null) ? size : "Regular";

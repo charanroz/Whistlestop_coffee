@@ -5,22 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bff34d5b-5c89-4548-876b-99f4594b61a2" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/DataLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/model/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/model/Order.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/model/OrderItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/model/OrderItem.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/service/OrderManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/service/OrderManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/classes/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/target/classes/com/whistlestop_coffee/whistlestop_coffee/controller/OrderController.class" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/classes/com/whistlestop_coffee/whistlestop_coffee/controller/OrderController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/target/classes/com/whistlestop_coffee/whistlestop_coffee/model/Order.class" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/classes/com/whistlestop_coffee/whistlestop_coffee/model/Order.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/target/classes/com/whistlestop_coffee/whistlestop_coffee/model/OrderItem.class" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/classes/com/whistlestop_coffee/whistlestop_coffee/model/OrderItem.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/target/classes/com/whistlestop_coffee/whistlestop_coffee/repository/OrderRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/classes/com/whistlestop_coffee/whistlestop_coffee/repository/OrderRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/target/classes/com/whistlestop_coffee/whistlestop_coffee/service/OrderManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/classes/com/whistlestop_coffee/whistlestop_coffee/service/OrderManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
