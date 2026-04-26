@@ -16,8 +16,13 @@
 /Users/nathapatkantahirun/Whistlestop_coffee/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/model/Payment.java
 /Users/nathapatkantahirun/Whistlestop_coffee/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/model/Staff.java
 /Users/nathapatkantahirun/Whistlestop_coffee/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/model/StationSetting.java
+/Users/nathapatkantahirun/Whistlestop_coffee/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/repository/BusinessHourRepository.java
 /Users/nathapatkantahirun/Whistlestop_coffee/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/repository/CustomerRepository.java
 /Users/nathapatkantahirun/Whistlestop_coffee/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/repository/MenuItemRepository.java
+/Users/nathapatkantahirun/Whistlestop_coffee/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/repository/OrderItemRepository.java
+/Users/nathapatkantahirun/Whistlestop_coffee/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/repository/OrderRepository.java
+/Users/nathapatkantahirun/Whistlestop_coffee/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/repository/PaymentRepository.java
+/Users/nathapatkantahirun/Whistlestop_coffee/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/repository/StationSettingRepository.java
 /Users/nathapatkantahirun/Whistlestop_coffee/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/service/BusinessHourManager.java
 /Users/nathapatkantahirun/Whistlestop_coffee/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/service/CustomerLoginService.java
 /Users/nathapatkantahirun/Whistlestop_coffee/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/service/LoginManager.java
