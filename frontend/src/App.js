@@ -1,34 +1,20 @@
-import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import MenuPage from "./pages/MenuPage";
+import OrdersPage from "./pages/OrdersPage";
 
 function App() {
-  const [menu, setMenu] = useState([]);
-
-  useEffect(() => {
-    fetch("http://localhost:8080/menu")
-      .then(res => res.json())
-      .then(data => setMenu(data));
-  }, []);
-
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>☕ Menu</h1>
+    <BrowserRouter>
+      <nav style={{ padding: "10px" }}>
+        <Link to="/">Menu</Link> |{" "}
+        <Link to="/orders">Orders</Link>
+      </nav>
 
-      {menu.map(item => (
-        <div
-          key={item.id}
-          style={{
-            border: "1px solid #ccc",
-            padding: "10px",
-            margin: "10px 0",
-            borderRadius: "8px"
-          }}
-        >
-          <h3>{item.name}</h3>
-          <p>Price: £{item.price}</p>
-          <button>Order</button>
-        </div>
-      ))}
-    </div>
+      <Routes>
+        <Route path="/" element={<MenuPage />} />
+        <Route path="/orders" element={<OrdersPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

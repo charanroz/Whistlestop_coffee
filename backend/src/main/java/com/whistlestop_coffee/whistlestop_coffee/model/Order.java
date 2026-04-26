@@ -3,6 +3,7 @@ package com.whistlestop_coffee.whistlestop_coffee.model;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "orders")
@@ -19,6 +20,7 @@ public class Order {
     private String pickupTime;
     private String status;
     private String cancelReason;
+
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items = new ArrayList<>();
@@ -43,6 +45,7 @@ public class Order {
     public List<OrderItem> getItems() { return items; }
 
     public void addItem(OrderItem item) {
+        item.setOrder(this);
         this.items.add(item);
     }
 
