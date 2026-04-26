@@ -1,0 +1,14 @@
+# Maven / Java
+target/
+*.log
+
+# macOS
+.DS_Store
+
+# Node (frontend)
+node_modules/
+build/
+
+# IDE
+.idea/
+.vscode/
