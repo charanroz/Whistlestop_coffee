@@ -7,6 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+import com.whistlestop_coffee.whistlestop_coffee.dto.OrderResponse;
+
+
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/orders")
 @CrossOrigin(origins = "*")
@@ -65,5 +70,16 @@ public class OrderController {
     @GetMapping("/archived")
     public List<Order> getArchivedOrders() {
         return orderManager.getArchivedOrders();
+    }
+
+    @GetMapping("/staff/active")
+    public List<OrderResponse> getActiveOrdersForStaff() {
+        // orderManager.getAllOrders() 默认返回的也就是未被 archive 的订单
+        List<Order> activeOrders = orderManager.getAllOrders();
+
+        // 将后端实体批量转换为前端需要的 DTO 格式
+        return activeOrders.stream()
+                .map(OrderResponse::from)
+                .collect(Collectors.toList());
     }
 }
