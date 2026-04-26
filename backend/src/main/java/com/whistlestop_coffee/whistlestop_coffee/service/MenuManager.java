@@ -3,80 +3,54 @@ package com.whistlestop_coffee.whistlestop_coffee.service;
 import com.whistlestop_coffee.whistlestop_coffee.dto.MenuItemResponse;
 import com.whistlestop_coffee.whistlestop_coffee.model.MenuItem;
 import com.whistlestop_coffee.whistlestop_coffee.repository.MenuItemRepository;
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-/**
- * Business logic layer for managing the Menu.
- */
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
 public class MenuManager {
 
-    // Data access layer dependency
-    private MenuItemRepository repository = new MenuItemRepository();
+    @Autowired
+    private MenuItemRepository repository;
 
-    /**
-     * For Customers: Returns only the menu items that are currently in stock.
-     */
     public List<MenuItemResponse> getAvailableMenu() {
-        List<MenuItemResponse> result = new ArrayList<>();
-        for (MenuItem item : repository.findActiveItems()) {
-            if (item.isAvailable()) {
-                result.add(MenuItemResponse.from(item));
-            }
-        }
-        return result;
+        return repository.findByIsAvailableTrueAndIsDeletedFalse()
+                .stream()
+                .map(MenuItemResponse::from)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * For Staff/Dashboard: Returns all active items, including those out of stock.
-     */
     public List<MenuItemResponse> getFullMenu() {
-        List<MenuItemResponse> result = new ArrayList<>();
-        for (MenuItem item : repository.findActiveItems()) {
-            result.add(MenuItemResponse.from(item));
-        }
-        return result;
+        return repository.findByIsDeletedFalse()
+                .stream()
+                .map(MenuItemResponse::from)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * For API/Frontend: Retrieves a single item as a DTO.
-     */
     public MenuItemResponse getById(int id) {
-        MenuItem item = repository.findById(id);
-        if (item != null) {
-            return MenuItemResponse.from(item);
-        }
-        return null;
+        return repository.findById(id)
+                .map(MenuItemResponse::from)
+                .orElse(null);
     }
 
-    /**
-     * IMPORTANT: For Internal Team Use (OrderManager).
-     * Order module needs the actual Entity to calculate prices and bind to orders.
-     * Do not return DTO here.
-     */
     public MenuItem getMenuItemEntity(int id) {
-        return repository.findById(id);
+        return repository.findById(id).orElse(null);
     }
 
-    /**
-     * For Staff: Mark an item as sold out or back in stock.
-     */
     public void updateAvailability(int id, boolean available) {
-        MenuItem item = repository.findById(id);
-        if (item != null) {
+        repository.findById(id).ifPresent(item -> {
             item.setAvailable(available);
-        }
+            repository.save(item);
+        });
     }
 
-    /**
-     * For Staff: Permanently remove an item from the menu (Soft Delete).
-     * We use soft delete to ensure past orders referencing this item do not break.
-     */
     public void deleteMenuItem(int id) {
-        MenuItem item = repository.findById(id);
-        if (item != null) {
-            item.setDeleted(true);    // Mark as deleted
-            item.setAvailable(false); // Make it automatically out of stock
-        }
+        repository.findById(id).ifPresent(item -> {
+            item.setDeleted(true);
+            item.setAvailable(false);
+            repository.save(item);
+        });
     }
 }

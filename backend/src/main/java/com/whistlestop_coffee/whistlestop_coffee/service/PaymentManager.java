@@ -1,48 +1,35 @@
 package com.whistlestop_coffee.whistlestop_coffee.service;
 
 import com.whistlestop_coffee.whistlestop_coffee.model.Payment;
+import com.whistlestop_coffee.whistlestop_coffee.repository.PaymentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
+@Service
 public class PaymentManager {
-    /**
-     * 1.   Used to handle multiple orders
-     * 2.   Ensures that each payment_ID is unique
-     */
-    private List<Payment> orderPaymentTable;
-    private int idCounter;
 
-
-    public PaymentManager() {
-        this.orderPaymentTable = new ArrayList<>();
-        this.idCounter = 1;
-    }
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     public Payment processHorsePayPayment(String orderId) {
-        //Reject invalid orders
         if (orderId == null || orderId.trim().isEmpty()) {
             throw new IllegalArgumentException("Order Id cannot be empty.");
         }
 
-        //Get current ID, and then increase counter by 1
         LocalDateTime confirmedTime = LocalDateTime.now();
-        Payment newPayment = new Payment(idCounter++, orderId, confirmedTime);
-        orderPaymentTable.add(newPayment);
-        System.out.println("HorsePay payment for: " + orderId + "\n"+"at " + confirmedTime);
-        return newPayment;
+        Payment newPayment = new Payment(orderId, confirmedTime);
+        return paymentRepository.save(newPayment);
     }
 
     public Optional<Payment> getPaymentById(int id) {
-        return orderPaymentTable.stream()
-                .filter(payment -> payment.getId() == id)
-                .findFirst();
+        return paymentRepository.findById(id);
     }
 
-    //Defensive Copying
     public List<Payment> getAllPayments() {
-        return new ArrayList<>(orderPaymentTable);
+        return paymentRepository.findAll();
     }
 }
