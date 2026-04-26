@@ -81,4 +81,7 @@ public class OrderManager {
     public List<Order> getArchivedOrders() {
         return orderRepository.findByStatus("Archived");
     }
+    public List<Order> getActiveOrders() {
+        return orderRepository.findByStatusNot("Archived");
+    }
 }

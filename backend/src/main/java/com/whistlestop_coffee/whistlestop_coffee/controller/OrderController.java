@@ -17,7 +17,12 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "*")
 public class OrderController {
 
-    private OrderManager orderManager = new OrderManager();
+    private final OrderManager orderManager;
+
+
+    public OrderController(OrderManager orderManager) {
+        this.orderManager = orderManager;
+    }
 
     @GetMapping
     public List<Order> getAllOrders() {
@@ -74,10 +79,9 @@ public class OrderController {
 
     @GetMapping("/staff/active")
     public List<OrderResponse> getActiveOrdersForStaff() {
-        // orderManager.getAllOrders() 默认返回的也就是未被 archive 的订单
-        List<Order> activeOrders = orderManager.getAllOrders();
 
-        // 将后端实体批量转换为前端需要的 DTO 格式
+        List<Order> activeOrders = orderManager.getActiveOrders();
+
         return activeOrders.stream()
                 .map(OrderResponse::from)
                 .collect(Collectors.toList());
