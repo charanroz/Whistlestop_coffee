@@ -1,20 +1,15 @@
-
 package com.whistlestop_coffee.whistlestop_coffee.service;
-
 
 import com.whistlestop_coffee.whistlestop_coffee.model.Customer;
 import com.whistlestop_coffee.whistlestop_coffee.repository.CustomerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 
 @Service
 public class CustomerLoginService {
 
+    @Autowired
     private CustomerRepository repository;
-
-    public CustomerLoginService() {
-        repository = new CustomerRepository();
-    }
 
     public LoginResult login(String email, String password) {
 
@@ -26,7 +21,7 @@ public class CustomerLoginService {
             return new LoginResult(false, "Password cannot be empty", null);
         }
 
-        Customer customer = repository.findByEmail(email.trim());
+        Customer customer = repository.findByEmail(email.trim()).orElse(null);
 
         if (customer == null) {
             return new LoginResult(false, "Customer not found", null);
@@ -39,4 +34,3 @@ public class CustomerLoginService {
         return new LoginResult(true, "Login successful", customer);
     }
 }
-
