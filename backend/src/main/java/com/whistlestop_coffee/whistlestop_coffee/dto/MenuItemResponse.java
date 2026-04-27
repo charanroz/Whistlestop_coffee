@@ -12,6 +12,7 @@ public class MenuItemResponse {
     public double priceRegular;
     public double priceLarge;
     public boolean available;
+    public boolean hasSize;
 
     /**
      * Factory method to convert a database entity (MenuItem) into a DTO.
@@ -23,6 +24,7 @@ public class MenuItemResponse {
         res.priceRegular = item.getPriceRegular();
         res.priceLarge = item.getPriceLarge();
         res.available = item.isAvailable();
+        res.hasSize = item.hasSize();
         return res;
     }
 }
