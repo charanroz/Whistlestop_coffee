@@ -1,12 +1,14 @@
 package com.whistlestop_coffee.whistlestop_coffee.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class BusinessHour {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String dayOfWeek;
     private String openTime;
     private String closeTime;
@@ -20,6 +22,10 @@ public class BusinessHour {
         this.openTime = openTime;
         this.closeTime = closeTime;
         this.closed = closed;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getDayOfWeek() {

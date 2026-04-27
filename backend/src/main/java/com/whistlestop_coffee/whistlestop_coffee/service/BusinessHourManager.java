@@ -2,7 +2,6 @@ package com.whistlestop_coffee.whistlestop_coffee.service;
 
 import com.whistlestop_coffee.whistlestop_coffee.model.BusinessHour;
 import com.whistlestop_coffee.whistlestop_coffee.repository.BusinessHourRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,11 +9,10 @@ import java.util.List;
 @Service
 public class BusinessHourManager {
 
-    @Autowired
-    private BusinessHourRepository businessHourRepository;
+    private final BusinessHourRepository businessHourRepository;
 
-    public BusinessHourManager() {
-        // Data will be loaded from database
+    public BusinessHourManager(BusinessHourRepository businessHourRepository) {
+        this.businessHourRepository = businessHourRepository;
     }
 
     public List<BusinessHour> getAllBusinessHours() {
@@ -28,16 +26,25 @@ public class BusinessHourManager {
 
     public BusinessHour updateBusinessHour(String dayOfWeek, BusinessHour updatedBusinessHour) {
         BusinessHour businessHour = getBusinessHourByDay(dayOfWeek);
+
         businessHour.setOpenTime(updatedBusinessHour.getOpenTime());
         businessHour.setCloseTime(updatedBusinessHour.getCloseTime());
         businessHour.setClosed(updatedBusinessHour.isClosed());
+
         return businessHourRepository.save(businessHour);
     }
 
     public boolean isWithinBusinessHours(String dayOfWeek, String time) {
         BusinessHour businessHour = getBusinessHourByDay(dayOfWeek);
-        if (businessHour.isClosed()) return false;
-        if (businessHour.getOpenTime() == null || businessHour.getCloseTime() == null) return false;
+
+        if (businessHour.isClosed()) {
+            return false;
+        }
+
+        if (businessHour.getOpenTime() == null || businessHour.getCloseTime() == null) {
+            return false;
+        }
+
         return time.compareTo(businessHour.getOpenTime()) >= 0
                 && time.compareTo(businessHour.getCloseTime()) <= 0;
     }
