@@ -6,8 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="bff34d5b-5c89-4548-876b-99f4594b61a2" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/model/OrderItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/model/OrderItem.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/service/OrderManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/service/OrderManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/model/MenuItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/model/MenuItem.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

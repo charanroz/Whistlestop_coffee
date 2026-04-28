@@ -4,7 +4,6 @@ function MenuPage() {
   const [menu, setMenu] = useState([]);
   const [selectedSizes, setSelectedSizes] = useState({});
 
-
   useEffect(() => {
     fetch("http://localhost:8080/menu")
       .then(res => res.json())
@@ -13,81 +12,76 @@ function MenuPage() {
   }, []);
 
   const handleSizeChange = (itemId, size) => {
-
     setSelectedSizes(prev => ({
       ...prev,
       [itemId]: size
     }));
   };
 
-const handleOrder = async (item) => {
+  const handleOrder = async (item) => {
 
-  const selectedSize = selectedSizes[item.id] || "Regular";
+    const selectedSize = item.hasSize
+      ? (selectedSizes[item.id] || "Regular")
+      : "Regular";
 
-  const order = {
-    customer: { id: 1 },
-    pickupTime: "10:00",
-    items: [
-      {
-        menuItemId: item.id,
-        size: selectedSize,
-        quantity: 1
+    const order = {
+      customer: { id: 1 },
+      pickupTime: "10:00",
+      items: [
+        {
+          menuItemId: item.id,
+          size: selectedSize,
+          quantity: 1
+        }
+      ]
+    };
+
+    try {
+      const res = await fetch("http://localhost:8080/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(order)
+      });
+
+      if (!res.ok) {
+        alert("Order failed");
+        return;
       }
-    ]
-  };
 
-  console.log("FINAL ORDER:", JSON.stringify(order, null, 2));
-
-  try {
-    const res = await fetch("http://localhost:8080/orders", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(order)
-    });
-
-    const text = await res.text();
-    console.log("RESPONSE:", text);
-
-    if (!res.ok) {
-      alert("Order failed");
-      return;
+      alert("Order placed!");
+    } catch (err) {
+      console.error(err);
     }
-
-    alert("Order placed!");
-  } catch (err) {
-    console.error(err);
-  }
-};
-
+  };
 
   return (
     <div style={{ padding: "20px" }}>
       <h1>☕ Menu</h1>
 
       {menu.map(item => (
-        <div
-          key={item.id}
-          style={{
-            border: "1px solid #ccc",
-            padding: "15px",
-            margin: "10px 0",
-            borderRadius: "8px"
-          }}
-        >
+        <div key={item.id} style={{
+          border: "1px solid #ccc",
+          padding: "15px",
+          margin: "10px 0",
+          borderRadius: "8px"
+        }}>
           <h3>{item.name}</h3>
 
           <p>Regular: £{item.priceRegular}</p>
-          <p>Large: £{item.priceLarge}</p>
 
-          <select
-            value={selectedSizes[item.id] || "Regular"}
-            onChange={(e) => handleSizeChange(item.id, e.target.value)}
-          >
-            <option value="Regular">Regular</option>
-            <option value="Large">Large</option>
-          </select>
+          {item.hasSize && <p>Large: £{item.priceLarge}</p>}
+
+          {item.hasSize && (
+            <select
+              value={selectedSizes[item.id] || "Regular"}
+              onChange={(e) => handleSizeChange(item.id, e.target.value)}
+            >
+              <option value="Regular">Regular</option>
+              <option value="Large">Large</option>
+            </select>
+          )}
 
           <br />
 
