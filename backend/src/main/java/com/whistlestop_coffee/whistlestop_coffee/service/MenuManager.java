@@ -53,4 +53,17 @@ public class MenuManager {
             repository.save(item);
         });
     }
+
+    public void addMenuItem(MenuItem newItem) {
+        newItem.setDeleted(false);
+        repository.save(newItem);
+    }
+
+    public void updatePrices(int id, double priceRegular, double priceLarge) {
+        repository.findById(id).ifPresent(item -> {
+            item.setPriceRegular(priceRegular);
+            item.setPriceLarge(priceLarge);
+            repository.save(item);
+        });
+    }
 }

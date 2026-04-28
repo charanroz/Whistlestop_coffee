@@ -45,4 +45,18 @@ public class MenuController {
         menuManager.deleteMenuItem(id);
         System.out.println("Item " + id + " has been logically deleted.");
     }
+
+    @PostMapping
+    public void addMenuItem(@RequestBody com.whistlestop_coffee.whistlestop_coffee.model.MenuItem newItem) {
+        menuManager.addMenuItem(newItem);
+        System.out.println("New item added: " + newItem.getName());
+    }
+
+    @PutMapping("/{id}/price")
+    public void updatePrices(@PathVariable int id,
+                             @RequestParam double priceRegular,
+                             @RequestParam double priceLarge) {
+        menuManager.updatePrices(id, priceRegular, priceLarge);
+        System.out.println("Item " + id + " prices updated to Regular: " + priceRegular + ", Large: " + priceLarge);
+    }
 }
