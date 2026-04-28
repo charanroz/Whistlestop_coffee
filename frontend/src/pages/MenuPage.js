@@ -69,7 +69,7 @@ function MenuPage() {
       ];
     });
 
-    setMessage("Added to cart ✅");
+    setMessage("Added to cart");
 
           setTimeout(() => {
             setMessage("");
