@@ -1,5 +1,4 @@
 package com.whistlestop_coffee.whistlestop_coffee.service;
-import com.whistlestop_coffee.whistlestop_coffee.repository.PaymentRepository;
 import com.whistlestop_coffee.whistlestop_coffee.model.Payment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
