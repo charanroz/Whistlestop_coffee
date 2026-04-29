@@ -7,7 +7,9 @@ import com.whistlestop_coffee.whistlestop_coffee.repository.OrderRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +24,38 @@ public class OrderManager {
     private MenuManager menuManager;
 
     private static final List<String> VALID_STATUSES = List.of(
-            "Accepted", "In Progress", "Ready for Collection", "Collected", "Cancelled"
+            "Accepted", "In Progress", "Ready for Collection", "Collected", "Cancelled",  "Archived"
     );
+    @Transactional
+    public void staffCancelOrder(int orderId, String reason) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("cannot find order ID: " + orderId));
 
+        // check logic
+        if ("NO_SHOW".equals(reason)) {
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime pickupTime = LocalDateTime.parse(order.getPickupTime());
+            LocalDateTime deadline = pickupTime.plusMinutes(15);
+
+            if (now.isBefore(deadline)) {
+                throw new RuntimeException("Since the 15-minute waiting time for food pickup has not yet expired, employees cannot cancel their orders on the grounds of 'not picking up food'.");
+            }
+
+            if (now.isBefore(deadline)) {
+                throw new RuntimeException("Since the 15-minute waiting time for food pickup has not yet expired, employees cannot cancel their orders on the grounds of 'not picking up food'.");
+            }
+        } else if ("OUT_OF_STOCK".equals(reason)) {
+            // out of stock (不做事，直接往下走去改變狀態)
+        } else {
+            throw new IllegalArgumentException("invalid reason.");
+        }
+
+        // renew the status of order
+        order.setStatus("Cancelled");
+        order.setCancelReason(reason);
+        orderRepository.save(order);
+
+    }
     public void createOrder(Order order) {
 
         List<OrderItem> fixedItems = new ArrayList<>();

@@ -20,8 +20,8 @@ public class PaymentManager {
             throw new IllegalArgumentException("Order Id cannot be empty.");
         }
 
-        LocalDateTime confirmedTime = LocalDateTime.now();
-        Payment newPayment = new Payment(orderId, confirmedTime);
+        LocalDateTime ConfirmedTime = LocalDateTime.now();
+        Payment newPayment = new Payment(orderId, ConfirmedTime);
         return paymentRepository.save(newPayment);
     }
 
