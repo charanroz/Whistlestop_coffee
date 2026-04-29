@@ -58,6 +58,7 @@ public class OrderController {
         return ResponseEntity.ok("Status updated successfully");
     }
 
+    //cancel
     @PutMapping("/{id}/cancel")
     public ResponseEntity<String> cancelOrder(@PathVariable int id, @RequestParam String reason) {
         boolean success = orderManager.cancelOrder(id, reason);
@@ -85,5 +86,18 @@ public class OrderController {
         return activeOrders.stream()
                 .map(OrderResponse::from)
                 .collect(Collectors.toList());
+    }
+        // staff cancel API
+        // ex: PUT http://localhost:8080/orders/{id}/staff-cancel?reason=NO_SHOW
+        @PutMapping("/{id}/staff-cancel")
+        public ResponseEntity<String> cancelOrderByStaff(
+                @PathVariable int id,
+                @RequestParam String reason) {
+            try {
+                orderManager.staffCancelOrder(id, reason);
+                return ResponseEntity.ok("cancellation is successful!\nReason is recorded.");
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(e.getMessage());
+            }
     }
 }
