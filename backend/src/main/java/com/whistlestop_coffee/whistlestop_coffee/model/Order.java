@@ -1,6 +1,8 @@
 package com.whistlestop_coffee.whistlestop_coffee.model;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -25,7 +27,8 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items = new ArrayList<>();
 
-    public Order() {}
+    public Order() {
+    }
 
     public Order(int id, Customer customer, String pickupTime) {
         this.id = id;
@@ -35,14 +38,37 @@ public class Order {
         this.items = new ArrayList<>();
     }
 
-    public int getId() { return id; }
-    public Customer getCustomer() { return customer; }
-    public String getPickupTime() { return pickupTime; }
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-    public String getCancelReason() { return cancelReason; }
-    public void setCancelReason(String reason) { this.cancelReason = reason; }
-    public List<OrderItem> getItems() { return items; }
+    public int getId() {
+        return id;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public String getPickupTime() {
+        return pickupTime;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getCancelReason() {
+        return cancelReason;
+    }
+
+    public void setCancelReason(String reason) {
+        this.cancelReason = reason;
+    }
+
+    public List<OrderItem> getItems() {
+        return items;
+    }
 
     public void addItem(OrderItem item) {
         item.setOrder(this);
@@ -56,7 +82,19 @@ public class Order {
         }
         return total;
     }
+    /*
+    //Show the status, ex: pending, cancelled and completed
+    @Column(name = "status")
+    private String status;
 
+    //cancellation reason
+    @Column(name = "cancellation_reason")
+    private String CancellationReason;
+
+    //confirm 15mins
+    @Column(name = "pickup_time")
+    private LocalDateTime pickupTime;
+*/
     @Override
     public String toString() {
         return "Order{" +
@@ -67,5 +105,6 @@ public class Order {
                 ", totalPrice=" + getTotalPrice() +
                 ", items=" + items +
                 '}';
+
     }
 }

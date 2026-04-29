@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 
+
 @Entity
 public class Payment {
 
@@ -14,6 +15,7 @@ public class Payment {
     private int id;
     private String orderId;
     private LocalDateTime paidAt;
+    private LocalDateTime confirmedTime;
 
     public Payment() {}
 
@@ -27,7 +29,13 @@ public class Payment {
         this.orderId = orderId;
         this.paidAt = paidAt;
     }
+    public LocalDateTime getConfirmedTime() {
+        return confirmedTime;
+    }
 
+    public void setConfirmedTime(LocalDateTime confirmedTime) {
+        this.confirmedTime = confirmedTime;
+    }
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public String getOrderId() { return orderId; }
