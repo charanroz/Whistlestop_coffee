@@ -11,6 +11,7 @@ public class OrderResponse {
     public String status;
     public double totalPrice;
     public List<OrderItemResponse> items;
+    public String cancellationReason;
 
     public static OrderResponse from(Order order) {
         OrderResponse res = new OrderResponse();
@@ -25,6 +26,12 @@ public class OrderResponse {
                 .map(OrderItemResponse::from)
                 .collect(Collectors.toList());
 
+        //OrderItem to DTO
+        if (order.getItems() != null) {
+            res.items = order.getItems().stream()
+                    .map(OrderItemResponse::from)
+                    .collect(Collectors.toList());
+        }
         return res;
     }
 }
