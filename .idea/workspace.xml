@@ -4,44 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bff34d5b-5c89-4548-876b-99f4594b61a2" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/config/CorsConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/dto/LoginResult.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/repository/StaffRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/ProtectedRoute.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/HomePage.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/LoginPage.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/MyOrdersPage.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/SignupPage.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/Styles.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/WhistlestopCoffeeApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/WhistlestopCoffeeApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/controller/CustomerLoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/controller/CustomerLoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/controller/OrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/controller/OrderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/controller/PaymentRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/controller/StaffLoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/controller/StaffLoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/controller/StationSettingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/controller/StationSettingController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/dto/OrderResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/dto/OrderResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/model/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/model/Order.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/model/OrderItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/model/OrderItem.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/repository/OrderRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/repository/OrderRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/service/CustomerLoginService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/service/CustomerLoginService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/service/LoginManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/service/StaffLoginService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/service/LoginResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/service/LoginResult.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/service/OrderManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/service/OrderManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/service/PaymentManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/whistlestop_coffee/whistlestop_coffee/service/PaymentManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/data.sql" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/data.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/CancelPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/CancelPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/CheckoutPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/CheckoutPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/MenuPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/MenuPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/OrdersPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/OrdersPage.js" afterDir="false" />
-    </list>
+    <list default="true" id="bff34d5b-5c89-4548-876b-99f4594b61a2" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
