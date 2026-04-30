@@ -203,10 +203,10 @@ function MenuPage() {
         body: JSON.stringify(order)
       });
 
-      const text = await res.text();   // 👈 get real response
+      const text = await res.text();
 
       if (!res.ok) {
-        console.error("Backend error:", text);  // 🔥 SEE ERROR
+        console.error("Backend error:", text);
         alert(text);
         return;
       }
@@ -230,7 +230,7 @@ function MenuPage() {
       <div className="flex justify-between items-center mb-8 max-w-6xl mx-auto">
         <div>
           <h1 className="text-3xl font-bold tracking-wide">
-            ☕ {station?.kioskName || "Loading..."}
+             {station?.kioskName || "Loading..."}
           </h1>
 
           {todayHours && (

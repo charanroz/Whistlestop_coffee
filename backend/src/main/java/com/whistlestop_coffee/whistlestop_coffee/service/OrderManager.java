@@ -130,22 +130,19 @@ public class OrderManager {
         orderRepository.save(order);
     }
 
-    // 📋 GET ALL
+
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
     }
 
-    // 🔍 GET BY ID
     public Order getOrderById(int id) {
         return orderRepository.findById(id).orElse(null);
     }
 
-    // 👤 GET BY CUSTOMER
     public List<Order> getOrdersByCustomer(int customerId) {
         return orderRepository.findByCustomerId(customerId);
     }
 
-    // 🚀 ACTIVE ORDERS
     public List<Order> getActiveOrders() {
         return orderRepository.findByArchivedFalse()
                 .stream()
@@ -154,12 +151,11 @@ public class OrderManager {
                 .toList();
     }
 
-    // 🗂 ARCHIVED
     public List<Order> getArchivedOrders() {
         return orderRepository.findByArchivedTrue();
     }
 
-    // 🔄 UPDATE STATUS
+
     public boolean updateStatus(int id, String status) {
         if (!validStatuses.contains(status)) return false;
 
@@ -171,7 +167,6 @@ public class OrderManager {
         return true;
     }
 
-    // ❌ CUSTOMER CANCEL
     public boolean cancelOrder(int id, String reason) {
 
         Order order = orderRepository.findById(id).orElse(null);
@@ -196,7 +191,7 @@ public class OrderManager {
         return true;
     }
 
-    // 🧑‍🍳 STAFF CANCEL
+
     public void staffCancelOrder(int id, String reason) {
 
         Order order = orderRepository.findById(id)
@@ -208,7 +203,7 @@ public class OrderManager {
         orderRepository.save(order);
     }
 
-    // 📦 MANUAL ARCHIVE
+
     public void archiveOrder(int id) {
 
         Order order = orderRepository.findById(id).orElse(null);

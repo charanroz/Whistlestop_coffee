@@ -67,7 +67,7 @@ function LoginPage() {
       <div className="bg-white p-8 rounded-2xl shadow-xl w-[350px]">
 
         <h1 className="text-2xl font-bold text-center mb-6">
-          ☕ Whistlestop
+          Whistlestop
         </h1>
 
         <select

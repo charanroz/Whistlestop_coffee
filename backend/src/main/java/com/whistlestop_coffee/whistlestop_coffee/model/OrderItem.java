@@ -28,7 +28,6 @@ public class OrderItem {
     @JsonIgnore
     private Order order;
 
-    // getters & setters
 
     public int getId() { return id; }
 
