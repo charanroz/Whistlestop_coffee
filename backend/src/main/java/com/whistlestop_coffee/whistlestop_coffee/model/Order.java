@@ -1,11 +1,9 @@
 package com.whistlestop_coffee.whistlestop_coffee.model;
 
 import jakarta.persistence.*;
-
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "orders")
@@ -15,96 +13,42 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    private String status;
+    private String pickupTime;
+    private boolean archived;
+    private String cancelReason;
+
+    private BigDecimal total;
+
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    private String pickupTime;
-    private String status;
-    private String cancelReason;
-
-
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items = new ArrayList<>();
 
-    public Order() {
-    }
+    // getters & setters
 
-    public Order(int id, Customer customer, String pickupTime) {
-        this.id = id;
-        this.customer = customer;
-        this.pickupTime = pickupTime;
-        this.status = "Pending";
-        this.items = new ArrayList<>();
-    }
+    public int getId() { return id; }
 
-    public int getId() {
-        return id;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public Customer getCustomer() {
-        return customer;
-    }
+    public String getPickupTime() { return pickupTime; }
+    public void setPickupTime(String pickupTime) { this.pickupTime = pickupTime; }
 
-    public String getPickupTime() {
-        return pickupTime;
-    }
+    public boolean isArchived() { return archived; }
+    public void setArchived(boolean archived) { this.archived = archived; }
 
-    public String getStatus() {
-        return status;
-    }
+    public String getCancelReason() { return cancelReason; }
+    public void setCancelReason(String cancelReason) { this.cancelReason = cancelReason; }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    public BigDecimal getTotal() { return total; }
+    public void setTotal(BigDecimal total) { this.total = total; }
 
-    public String getCancelReason() {
-        return cancelReason;
-    }
+    public Customer getCustomer() { return customer; }
+    public void setCustomer(Customer customer) { this.customer = customer; }
 
-    public void setCancelReason(String reason) {
-        this.cancelReason = reason;
-    }
-
-    public List<OrderItem> getItems() {
-        return items;
-    }
-
-    public void addItem(OrderItem item) {
-        item.setOrder(this);
-        this.items.add(item);
-    }
-
-    public double getTotalPrice() {
-        double total = 0;
-        for (OrderItem item : items) {
-            total += item.getSubtotal().doubleValue();
-        }
-        return total;
-    }
-    /*
-    //Show the status, ex: pending, cancelled and completed
-    @Column(name = "status")
-    private String status;
-
-    //cancellation reason
-    @Column(name = "cancellation_reason")
-    private String CancellationReason;
-
-    //confirm 15mins
-    @Column(name = "pickup_time")
-    private LocalDateTime pickupTime;
-*/
-    @Override
-    public String toString() {
-        return "Order{" +
-                "id=" + id +
-                ", customer=" + customer.getName() +
-                ", pickupTime='" + pickupTime + '\'' +
-                ", status='" + status + '\'' +
-                ", totalPrice=" + getTotalPrice() +
-                ", items=" + items +
-                '}';
-
-    }
+    public List<OrderItem> getItems() { return items; }
+    public void setItems(List<OrderItem> items) { this.items = items; }
 }

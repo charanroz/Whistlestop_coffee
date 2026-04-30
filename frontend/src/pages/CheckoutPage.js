@@ -1,60 +1,89 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
 function CheckoutPage() {
-    // get order ID from URL
-    const { orderId } = useParams();
-    const [paymentResult, setPaymentResult] = useState(null);
-    const [errorMessage, setErrorMessage] = useState('');
+  const { orderId } = useParams();
+  const navigate = useNavigate();
 
-    const handlePayment = async () => {
-        try {
-            // PaymentController API
-            const response = await fetch(`http://localhost:8080/payments/process?orderId=${orderId}`, {
-                method: 'POST',
-            });
+  const [paymentResult, setPaymentResult] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-            if (response.ok) {
-                // if successful, the backend will return a JSON object named "Payment".
-                const paymentData = await response.json();
-                setPaymentResult(paymentData);
-                setErrorMessage('');
-            } else {
-                const errorText = await response.text();
-                setErrorMessage(errorText);
-                setPaymentResult(null);
-            }
-        } catch (error) {
-            setErrorMessage("connection failed");
-        }
-    };
+  const handlePayment = async () => {
+    setLoading(true);
 
-    return (
-        <div style={{ padding: '20px', maxWidth: '400px', margin: '0 auto' }}>
-            <h2>🛒 Order List</h2>
-            <p>Order ID: {orderId}</p>
+    try {
+      const response = await fetch(
+        `http://localhost:8080/payments/process?orderId=${orderId}`,
+        { method: "POST" }
+      );
 
-            <button
-                onClick={handlePayment}
-                style={{ padding: '10px 20px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
-            >
-                Use HorsePay payment
-            </button>
+      if (response.ok) {
+        const paymentData = await response.json();
+        setPaymentResult(paymentData);
+        setErrorMessage("");
 
-            {/* error message */}
-            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+        // ✅ redirect after success
+        setTimeout(() => {
+          navigate("/orders");
+        }, 2000);
+      } else {
+        const errorText = await response.text();
+        setErrorMessage(errorText);
+      }
+    } catch (error) {
+      setErrorMessage("Server not responding. Check backend.");
+    }
 
-            {/* payment detail */}
-            {paymentResult && (
-                <div style={{ marginTop: '20px', padding: '15px', border: '1px solid #ddd', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
-                    <h3 style={{ color: '#2ecc71' }}>Payment successful !</h3>
-                    <p><strong>payment ID：</strong> {paymentResult.paymentId}</p>
-                    <p><strong>Order ID：</strong> {paymentResult.orderId}</p>
-                    <p><strong>Time：</strong> {new Date(paymentResult.confirmedTime).toLocaleString()}</p>
-                </div>
-            )}
+    setLoading(false);
+  };
+
+  return (
+    <div style={{ padding: "20px", maxWidth: "400px", margin: "auto" }}>
+      <h2>💳 Checkout</h2>
+
+      <p><strong>Order ID:</strong> {orderId}</p>
+
+      <button
+        onClick={handlePayment}
+        disabled={loading || paymentResult}
+        style={{
+          padding: "10px",
+          width: "100%",
+          backgroundColor: "#4CAF50",
+          color: "white",
+          border: "none",
+          borderRadius: "5px"
+        }}
+      >
+        {loading ? "Processing..." : "Pay with HorsePay"}
+      </button>
+
+      {errorMessage && (
+        <p style={{ color: "red", marginTop: "10px" }}>
+          {errorMessage}
+        </p>
+      )}
+
+      {paymentResult && (
+        <div style={{
+          marginTop: "20px",
+          padding: "15px",
+          border: "1px solid #ddd",
+          borderRadius: "8px",
+          backgroundColor: "#f9f9f9"
+        }}>
+          <h3 style={{ color: "green" }}> Payment Successful</h3>
+          <p><strong>Payment ID:</strong> {paymentResult.paymentId}</p>
+          <p><strong>Order ID:</strong> {paymentResult.orderId}</p>
+          <p>
+            <strong>Time:</strong>{" "}
+            {new Date(paymentResult.confirmedTime).toLocaleString()}
+          </p>
         </div>
-    );
+      )}
+    </div>
+  );
 }
 
 export default CheckoutPage;

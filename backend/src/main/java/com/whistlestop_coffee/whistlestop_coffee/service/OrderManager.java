@@ -1,17 +1,15 @@
 package com.whistlestop_coffee.whistlestop_coffee.service;
 
-import com.whistlestop_coffee.whistlestop_coffee.model.MenuItem;
-import com.whistlestop_coffee.whistlestop_coffee.model.Order;
-import com.whistlestop_coffee.whistlestop_coffee.model.OrderItem;
-import com.whistlestop_coffee.whistlestop_coffee.repository.OrderRepository;
+import com.whistlestop_coffee.whistlestop_coffee.model.*;
+import com.whistlestop_coffee.whistlestop_coffee.repository.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.scheduling.annotation.Scheduled;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
 import java.time.LocalTime;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -21,149 +19,193 @@ public class OrderManager {
     private OrderRepository orderRepository;
 
     @Autowired
-    private MenuManager menuManager;
+    private MenuItemRepository menuItemRepository;
 
-    private static final List<String> VALID_STATUSES = List.of(
-            "Accepted", "In Progress", "Ready for Collection", "Collected", "Cancelled",  "Archived"
+    private final List<String> validStatuses = Arrays.asList(
+            "Pending",
+            "Accepted",
+            "In Progress",
+            "Ready for Collection",
+            "Collected",
+            "Cancelled"
     );
-    @Transactional
-    public void staffCancelOrder(int orderId, String reason) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("cannot find order ID: " + orderId));
 
-        // check logic
-        if ("NO_SHOW".equals(reason)) {
-            LocalDateTime now = LocalDateTime.now();
-            LocalDateTime pickupTime = LocalDateTime.parse(order.getPickupTime());
-            LocalDateTime deadline = pickupTime.plusMinutes(15);
+    // ARCHIVE instead of DELETE
+    @Scheduled(cron = "0 0 23 * * ?") // 11 PM daily
+    public void archiveCompletedOrders() {
 
-            if (now.isBefore(deadline)) {
-                throw new RuntimeException("Since the 15-minute waiting time for food pickup has not yet expired, employees cannot cancel their orders on the grounds of 'not picking up food'.");
-            }
+        List<Order> orders = orderRepository.findByStatusIn(
+                Arrays.asList("Collected", "Cancelled")
+        );
 
-            if (now.isBefore(deadline)) {
-                throw new RuntimeException("Since the 15-minute waiting time for food pickup has not yet expired, employees cannot cancel their orders on the grounds of 'not picking up food'.");
-            }
-        } else if ("OUT_OF_STOCK".equals(reason)) {
-            // out of stock (不做事，直接往下走去改變狀態)
-        } else {
-            throw new IllegalArgumentException("invalid reason.");
+        for (Order order : orders) {
+            order.setArchived(true);
         }
 
-        // renew the status of order
-        order.setStatus("Cancelled");
-        order.setCancelReason(reason);
-        orderRepository.save(order);
+        orderRepository.saveAll(orders);
 
+        System.out.println("📦 Archived collected & cancelled orders");
     }
-    public void createOrder(Order order) {
 
-        List<OrderItem> fixedItems = new ArrayList<>();
+    //  CREATE ORDER WITH TOTAL
+    public Order createOrder(Order order) {
+
+        order.setStatus("Pending");
+
+        BigDecimal total = BigDecimal.ZERO;
 
         for (OrderItem item : order.getItems()) {
 
-            int menuItemId = item.getMenuItemId();
+            MenuItem menuItem = menuItemRepository.findById(
+                    item.getMenuItemId()
+            ).orElseThrow(() -> new RuntimeException("Menu item not found"));
 
-            MenuItem menuItem = menuManager.getMenuItemEntity(menuItemId);
+            item.setMenuItem(menuItem);
 
-            if (menuItem != null) {
+            BigDecimal price;
 
-                double price;
-
-                if ("Large".equalsIgnoreCase(item.getSize())) {
-                    price = menuItem.getPriceLarge();
-                } else {
-                    price = menuItem.getPriceRegular();
-                }
-
-                OrderItem newItem = new OrderItem(
-                        menuItem,
-                        item.getSize(),
-                        item.getQuantity(),
-                        java.math.BigDecimal.valueOf(price)
-                );
-
-                newItem.setOrder(order);
-
-                fixedItems.add(newItem);
-
+            if ("Large".equalsIgnoreCase(item.getSize())) {
+                price = BigDecimal.valueOf(menuItem.getPriceLarge());
             } else {
-                throw new RuntimeException("MenuItem not found for id: " + menuItemId);
+                price = BigDecimal.valueOf(menuItem.getPriceRegular());
             }
+
+            item.setUnitPrice(price);
+
+            BigDecimal itemTotal = price.multiply(
+                    BigDecimal.valueOf(item.getQuantity())
+            );
+
+            total = total.add(itemTotal);
+
+            item.setOrder(order);
         }
 
-        order.getItems().clear();
-        order.getItems().addAll(fixedItems);
+        order.setTotal(total);
 
-        order.setStatus("Accepted");
+        return orderRepository.save(order);
+    }
+
+    //  ADD ITEM TO ORDER
+    public void addItemToOrder(int orderId, OrderItem item) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        MenuItem menuItem = menuItemRepository.findById(item.getMenuItemId())
+                .orElseThrow(() -> new RuntimeException("Menu item not found"));
+
+        item.setMenuItem(menuItem);
+
+        BigDecimal price;
+
+        if ("Large".equalsIgnoreCase(item.getSize())) {
+            price = BigDecimal.valueOf(menuItem.getPriceLarge());
+        } else {
+            price = BigDecimal.valueOf(menuItem.getPriceRegular());
+        }
+
+        item.setUnitPrice(price);
+        item.setOrder(order);
+
+        order.getItems().add(item);
+
+        //  recalculate total
+        BigDecimal total = order.getItems().stream()
+                .map(i -> i.getUnitPrice().multiply(BigDecimal.valueOf(i.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        order.setTotal(total);
 
         orderRepository.save(order);
     }
 
+    //  GET ALL
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
     }
 
+    //  GET BY ID
     public Order getOrderById(int id) {
         return orderRepository.findById(id).orElse(null);
     }
 
+    //  GET BY CUSTOMER
     public List<Order> getOrdersByCustomer(int customerId) {
         return orderRepository.findByCustomerId(customerId);
     }
 
-    public void addItemToOrder(int orderId, OrderItem item) {
-        Order order = getOrderById(orderId);
-        if (order != null) {
-            order.addItem(item);
-            orderRepository.save(order);
-        }
+    //  ACTIVE ORDERS (hide completed)
+    public List<Order> getActiveOrders() {
+        return orderRepository.findByArchivedFalse()
+                .stream()
+                .filter(o -> !o.getStatus().equals("Collected") &&
+                        !o.getStatus().equals("Cancelled"))
+                .toList();
     }
 
+    //  ARCHIVED ORDERS
+    public List<Order> getArchivedOrders() {
+        return orderRepository.findByArchivedTrue();
+    }
+
+    //  UPDATE STATUS
     public boolean updateStatus(int id, String status) {
-        if (!VALID_STATUSES.contains(status)) return false;
+        if (!validStatuses.contains(status)) return false;
 
-        Order order = getOrderById(id);
-        if (order != null) {
-            order.setStatus(status);
-            orderRepository.save(order);
-            return true;
-        }
-        return false;
-    }
-
-    public boolean cancelOrder(int id, String reason) {
-        Order order = getOrderById(id);
+        Order order = orderRepository.findById(id).orElse(null);
         if (order == null) return false;
 
-        if (reason.equals("no_show")) {
-            LocalTime pickupTime = LocalTime.parse(order.getPickupTime());
-            LocalTime cutoff = pickupTime.plusMinutes(15);
+        order.setStatus(status);
+        orderRepository.save(order);
+        return true;
+    }
 
-            if (LocalTime.now().isBefore(cutoff)) {
+    //  CUSTOMER CANCEL
+    public boolean cancelOrder(int id, String reason) {
+
+        Order order = orderRepository.findById(id).orElse(null);
+        if (order == null) return false;
+
+        try {
+            LocalTime pickup = LocalTime.parse(order.getPickupTime());
+            LocalTime now = LocalTime.now();
+
+            if (now.isBefore(pickup.plusMinutes(15))) {
                 return false;
             }
+
+        } catch (Exception e) {
+            return false;
         }
 
         order.setStatus("Cancelled");
         order.setCancelReason(reason);
         orderRepository.save(order);
+
         return true;
     }
 
+    //  STAFF CANCEL
+    public void staffCancelOrder(int id, String reason) {
+
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        order.setStatus("Cancelled");
+        order.setCancelReason(reason);
+
+        orderRepository.save(order);
+    }
+
+    //  MANUAL ARCHIVE
     public void archiveOrder(int id) {
-        Order order = getOrderById(id);
-        if (order != null && order.getStatus().equals("Collected")) {
-            order.setStatus("Archived");
+
+        Order order = orderRepository.findById(id).orElse(null);
+
+        if (order != null) {
+            order.setArchived(true);
             orderRepository.save(order);
         }
-    }
-
-    public List<Order> getArchivedOrders() {
-        return orderRepository.findByStatus("Archived");
-    }
-
-    public List<Order> getActiveOrders() {
-        return orderRepository.findByStatusNot("Archived");
     }
 }

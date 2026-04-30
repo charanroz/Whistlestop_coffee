@@ -1,17 +1,15 @@
 package com.whistlestop_coffee.whistlestop_coffee.service;
 
-import com.whistlestop_coffee.whistlestop_coffee.model.Customer;
-
 public class LoginResult {
 
     private boolean success;
     private String message;
-    private Customer customer;
+    private Object data; //
 
-    public LoginResult(boolean success, String message, Customer customer) {
+    public LoginResult(boolean success, String message, Object data) {
         this.success = success;
         this.message = message;
-        this.customer = customer;
+        this.data = data;
     }
 
     public boolean isSuccess() {
@@ -22,7 +20,7 @@ public class LoginResult {
         return message;
     }
 
-    public Customer getCustomer() {
-        return customer;
+    public Object getData() {
+        return data;
     }
 }

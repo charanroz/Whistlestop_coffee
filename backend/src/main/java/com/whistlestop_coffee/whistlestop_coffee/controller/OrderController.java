@@ -5,12 +5,8 @@ import com.whistlestop_coffee.whistlestop_coffee.model.OrderItem;
 import com.whistlestop_coffee.whistlestop_coffee.service.OrderManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-
-import com.whistlestop_coffee.whistlestop_coffee.dto.OrderResponse;
-
-
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/orders")
@@ -19,85 +15,92 @@ public class OrderController {
 
     private final OrderManager orderManager;
 
-
     public OrderController(OrderManager orderManager) {
         this.orderManager = orderManager;
     }
 
+    //  GET ALL
     @GetMapping
     public List<Order> getAllOrders() {
         return orderManager.getAllOrders();
     }
 
+    //  GET BY ID
     @GetMapping("/{id}")
     public Order getOrderById(@PathVariable int id) {
         return orderManager.getOrderById(id);
     }
 
+    // GET BY CUSTOMER
     @GetMapping("/customer/{customerId}")
     public List<Order> getOrdersByCustomer(@PathVariable int customerId) {
         return orderManager.getOrdersByCustomer(customerId);
     }
 
+    //  CREATE ORDER
     @PostMapping
-    public void createOrder(@RequestBody Order order) {
-        orderManager.createOrder(order);
+    public Order createOrder(@RequestBody Order order) {
+        return orderManager.createOrder(order);
     }
 
+    //  ADD ITEM
     @PostMapping("/{orderId}/items")
-    public void addItemToOrder(@PathVariable int orderId, @RequestBody OrderItem item) {
+    public void addItemToOrder(@PathVariable int orderId,
+                               @RequestBody OrderItem item) {
         orderManager.addItemToOrder(orderId, item);
     }
 
+    //  UPDATE STATUS
     @PutMapping("/{id}/status")
-    public ResponseEntity<String> updateStatus(@PathVariable int id, @RequestParam String status) {
+    public ResponseEntity<String> updateStatus(@PathVariable int id,
+                                               @RequestParam String status) {
         boolean success = orderManager.updateStatus(id, status);
         if (!success) {
-            return ResponseEntity.badRequest().body("Invalid status or order not found");
+            return ResponseEntity.badRequest()
+                    .body("Invalid status or order not found");
         }
         return ResponseEntity.ok("Status updated successfully");
     }
 
-    //cancel
+    //  CUSTOMER CANCEL
     @PutMapping("/{id}/cancel")
-    public ResponseEntity<String> cancelOrder(@PathVariable int id, @RequestParam String reason) {
+    public ResponseEntity<String> cancelOrder(@PathVariable int id,
+                                              @RequestParam String reason) {
         boolean success = orderManager.cancelOrder(id, reason);
         if (!success) {
-            return ResponseEntity.badRequest().body("Cannot cancel order — order not found or 15 minutes have not passed yet");
+            return ResponseEntity.badRequest()
+                    .body("Cannot cancel order yet");
         }
         return ResponseEntity.ok("Order cancelled successfully");
     }
 
+    //  STAFF CANCEL
+    @PutMapping("/{id}/staff-cancel")
+    public ResponseEntity<String> staffCancelOrder(@PathVariable int id,
+                                                   @RequestParam String reason) {
+        try {
+            orderManager.staffCancelOrder(id, reason);
+            return ResponseEntity.ok("Order cancelled by staff");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    //  ARCHIVE
     @PutMapping("/{id}/archive")
     public void archiveOrder(@PathVariable int id) {
         orderManager.archiveOrder(id);
     }
 
+    //  ACTIVE ORDERS
+    @GetMapping("/staff/active")
+    public List<Order> getActiveOrders() {
+        return orderManager.getActiveOrders();
+    }
+
+    //  ARCHIVED
     @GetMapping("/archived")
     public List<Order> getArchivedOrders() {
         return orderManager.getArchivedOrders();
-    }
-
-    @GetMapping("/staff/active")
-    public List<OrderResponse> getActiveOrdersForStaff() {
-
-        List<Order> activeOrders = orderManager.getActiveOrders();
-
-        return activeOrders.stream()
-                .map(OrderResponse::from)
-                .collect(Collectors.toList());
-    }
-        // staff cancel API
-        // ex: PUT http://localhost:8080/orders/{id}/staff-cancel?reason=NO_SHOW
-        @PutMapping("/{id}/staff-cancel")
-        public ResponseEntity<String> cancelOrderByStaff(
-                @PathVariable int id,
-                @RequestParam String reason) {
-            try {
-                orderManager.staffCancelOrder(id, reason);
-                return ResponseEntity.ok("cancellation is successful!\nReason is recorded.");
-            } catch (Exception e) {
-                return ResponseEntity.badRequest().body(e.getMessage());
-            }
     }
 }
