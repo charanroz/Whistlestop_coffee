@@ -73,7 +73,7 @@ function OrdersPage() {
             padding: "20px",
             boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
 
-            // highlight READY orders
+            //highlight READY orders
             border:
               order.status === "Ready for Collection"
                 ? "3px solid green"
