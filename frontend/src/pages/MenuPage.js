@@ -21,15 +21,18 @@ function MenuPage() {
   useEffect(() => {
     fetch("http://localhost:8080/menu")
       .then(res => res.json())
-      .then(setMenu);
+      .then(setMenu)
+      .catch(() => console.log("Menu fetch failed"));
 
     fetch("http://localhost:8080/station-setting")
       .then(res => res.json())
-      .then(setStation);
+      .then(setStation)
+      .catch(() => console.log("Station fetch failed"));
 
     fetch("http://localhost:8080/business-hours")
       .then(res => res.json())
-      .then(setHours);
+      .then(setHours)
+      .catch(() => console.log("Hours fetch failed"));
   }, []);
 
   // live time
@@ -59,7 +62,7 @@ function MenuPage() {
 
   // time slots
   const timeSlots = useMemo(() => {
-    if (!todayHours || !todayHours.openTime) return [];
+    if (!todayHours || todayHours.closed || !todayHours.openTime) return [];
 
     const slots = [];
     let [hour, minute] = todayHours.openTime.split(":").map(Number);
@@ -101,15 +104,15 @@ function MenuPage() {
   };
 
   // image map
- const imageMap = {
-     "Americano": "https://images.unsplash.com/photo-1580661869408-55ab23f2ca6e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YW1lcmljYW5vfGVufDB8fDB8fHww",
-     "Americano with milk": "https://images.unsplash.com/photo-1565434007235-d3a18c2e0954?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-     "Latte": "https://images.unsplash.com/photo-1593443320739-77f74939d0da?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bGF0dGV8ZW58MHx8MHx8fDA%3D",
-     "Cappuccino": "https://plus.unsplash.com/premium_photo-1673545518947-ddf3240090b1?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fGNhcHB1Y2Npbm98ZW58MHx8MHx8fDA%3D",
-     "Hot Chocolate": "https://images.unsplash.com/photo-1608651057580-4a50b2fc2281?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGhvdCUyMGNob2NvbGF0ZXxlbnwwfHwwfHx8MA%3D%3D",
-     "Mocha": "https://images.unsplash.com/photo-1618576230663-9714aecfb99a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bW9jaGF8ZW58MHx8MHx8fDA%3D",
-     "Mineral Water": "https://plus.unsplash.com/premium_photo-1681236320994-3395e842ed81?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fG1pbmVyYWwlMjB3YXRlciUyMGJvdHRsZXxlbnwwfHwwfHx8MA%3D%3D"
-   };
+  const imageMap = {
+    "Americano": "https://images.unsplash.com/photo-1580661869408-55ab23f2ca6e?w=500",
+    "Americano with milk": "https://images.unsplash.com/photo-1565434007235-d3a18c2e0954",
+    "Latte": "https://images.unsplash.com/photo-1593443320739-77f74939d0da?w=500",
+    "Cappuccino": "https://images.unsplash.com/photo-1512568400610-62da28bc8a13?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGNhcHB1Y2Npbm98ZW58MHx8MHx8fDA%3D",
+    "Hot Chocolate": "https://images.unsplash.com/photo-1608651057580-4a50b2fc2281?w=500",
+    "Mocha": "https://images.unsplash.com/photo-1618576230663-9714aecfb99a?w=500",
+    "Mineral Water": "https://plus.unsplash.com/premium_photo-1681236320994-3395e842ed81?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fG1pbmVyYWwlMjB3YXRlciUyMGJvdHRsZXxlbnwwfHwwfHx8MA%3D%3D"
+  };
 
   // size selection
   const handleSizeChange = (itemId, size) => {
@@ -165,34 +168,21 @@ function MenuPage() {
     setCart(prev =>
       prev.flatMap((item, i) => {
         if (i !== index) return item;
-
-        if (item.quantity === 1) {
-          return [];
-        }
-
+        if (item.quantity === 1) return [];
         return { ...item, quantity: item.quantity - 1 };
       })
     );
   };
 
-  const removeItem = (index) => {
-    setCart(prev => prev.filter((_, i) => i !== index));
-  };
-
- const cartTotal = cart.reduce(
-   (t, i) => t + i.selectedPrice * i.quantity,
-   0
- );
+  const cartTotal = cart.reduce(
+    (t, i) => t + i.selectedPrice * i.quantity,
+    0
+  );
 
   // place order
   const placeOrder = async () => {
     if (cart.length === 0) {
       alert("Cart is empty");
-      return;
-    }
-
-    if (!user || !user.id) {
-      alert("User not logged in properly");
       return;
     }
 
@@ -209,9 +199,7 @@ function MenuPage() {
     try {
       const res = await fetch("http://localhost:8080/orders", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(order)
       });
 
@@ -222,14 +210,13 @@ function MenuPage() {
       setCart([]);
       navigate(`/checkout/${data.id}`);
 
-    } catch (err) {
+    } catch {
       alert("Failed to place order");
     }
   };
 
   return (
     <div className="bg-[#f5f1eb] min-h-screen p-6 font-sans">
-
       {/* HEADER */}
       <div className="flex justify-between items-center mb-8 max-w-6xl mx-auto">
         <div>
@@ -248,18 +235,15 @@ function MenuPage() {
           )}
         </div>
 
-        <div className="flex items-center gap-4">
-          <span className="font-medium">Welcome {user?.name}</span>
-          <button
-            onClick={() => {
-              localStorage.removeItem("user");
-              navigate("/");
-            }}
-            className="bg-red-500 text-white px-4 py-2 rounded-lg"
-          >
-            Logout
-          </button>
-        </div>
+        <button
+          onClick={() => {
+            localStorage.removeItem("user");
+            navigate("/");
+          }}
+          className="bg-red-500 text-white px-4 py-2 rounded-lg"
+        >
+          Logout
+        </button>
       </div>
 
       {/* MAIN */}
@@ -269,17 +253,12 @@ function MenuPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-1">
           {menu.map(item => {
             const size = selectedSizes[item.id] || "Regular";
-
-            const price =
-              size === "Large"
-                ? item.priceLarge
-                : item.priceRegular;
+            const price = size === "Large" ? item.priceLarge : item.priceRegular;
 
             return (
               <div key={item.id} className="bg-white rounded-2xl shadow hover:shadow-xl transition">
-
                 <img
-                  src={imageMap[item.name]}
+                  src={imageMap[item.name] || "https://images.unsplash.com/photo-1509042239860-f550ce710b93"}
                   alt={item.name}
                   className="w-full h-40 object-cover rounded-t-2xl"
                 />
@@ -287,30 +266,19 @@ function MenuPage() {
                 <div className="p-4">
                   <h3 className="font-semibold text-lg">{item.name}</h3>
 
-                  {/* SIZE SELECTOR */}
                   {item.hasSize && (
                     <div className="flex gap-2 mt-2">
-                      <button
-                        onClick={() => handleSizeChange(item.id, "Regular")}
-                        className={`px-3 py-1 rounded ${
-                          size === "Regular"
-                            ? "bg-[#6f4e37] text-white"
-                            : "bg-gray-200"
-                        }`}
-                      >
-                        Regular
-                      </button>
-
-                      <button
-                        onClick={() => handleSizeChange(item.id, "Large")}
-                        className={`px-3 py-1 rounded ${
-                          size === "Large"
-                            ? "bg-[#6f4e37] text-white"
-                            : "bg-gray-200"
-                        }`}
-                      >
-                        Large
-                      </button>
+                      {["Regular", "Large"].map(s => (
+                        <button
+                          key={s}
+                          onClick={() => handleSizeChange(item.id, s)}
+                          className={`px-3 py-1 rounded ${
+                            size === s ? "bg-[#6f4e37] text-white" : "bg-gray-200"
+                          }`}
+                        >
+                          {s}
+                        </button>
+                      ))}
                     </div>
                   )}
 
@@ -332,20 +300,13 @@ function MenuPage() {
 
         {/* CART */}
         <div className="w-80 bg-white rounded-2xl shadow-lg p-5">
-
           <h2 className="text-xl font-bold mb-4">🛒 Cart</h2>
 
           {cart.length === 0 && <p className="text-gray-500">Empty</p>}
 
           {cart.map((item, i) => (
             <div key={i} className="text-sm border-b py-2">
-
-              <div className="flex justify-between items-center">
-                <span>
-                  {item.name} ({item.size})
-                </span>
-
-              </div>
+              <div>{item.name} ({item.size})</div>
 
               <div className="flex items-center gap-2 mt-1">
                 <button
@@ -368,7 +329,6 @@ function MenuPage() {
                   £{(item.selectedPrice * item.quantity).toFixed(2)}
                 </span>
               </div>
-
             </div>
           ))}
 
@@ -377,25 +337,17 @@ function MenuPage() {
           </div>
 
           {/* PICKUP */}
-          <div className="mt-4">
-            <label className="text-sm font-medium">Pickup Time</label>
-
-            {timeSlots.length === 0 ? (
-              <p className="text-red-500 mt-2">No pickup slots available</p>
-            ) : (
-              <select
-                value={pickupTime}
-                onChange={e => setPickupTime(e.target.value)}
-                className="w-full border rounded-lg p-2 mt-1"
-              >
-                {timeSlots.map(time => (
-                  <option key={time} value={time}>
-                    {formatTime(time)}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
+          <select
+            value={pickupTime}
+            onChange={e => setPickupTime(e.target.value)}
+            className="w-full border rounded-lg p-2 mt-3"
+          >
+            {timeSlots.map(time => (
+              <option key={time} value={time}>
+                {formatTime(time)}
+              </option>
+            ))}
+          </select>
 
           <button
             onClick={placeOrder}
@@ -404,7 +356,6 @@ function MenuPage() {
           >
             Checkout (£{cartTotal.toFixed(2)})
           </button>
-
         </div>
       </div>
     </div>
