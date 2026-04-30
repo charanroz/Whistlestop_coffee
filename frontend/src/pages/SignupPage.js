@@ -37,27 +37,53 @@ function SignupPage() {
   };
 
   return (
-    <div style={{
-      height: "100vh",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      background: "#f5f1eb"
-    }}>
-      <div style={{
-        background: "white",
-        padding: "40px",
-        borderRadius: "15px",
-        width: "300px",
-        textAlign: "center"
-      }}>
-        <h2>☕ Signup</h2>
+    <div className="min-h-screen flex items-center justify-center bg-[#f5f1eb]">
 
-        <input placeholder="Name" onChange={e => setName(e.target.value)} />
-        <input placeholder="Email" onChange={e => setEmail(e.target.value)} />
-        <input type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} />
+      <div className="bg-white p-8 rounded-2xl shadow-xl w-[360px]">
 
-        <button onClick={handleSignup}>Sign Up</button>
+        <h1 className="text-2xl font-bold text-center mb-6">
+          Create Account
+        </h1>
+
+        <input
+          placeholder="Full Name"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          className="w-full p-3 border rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-[#6f4e37]"
+        />
+
+        <input
+          placeholder="Email Address"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          className="w-full p-3 border rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-[#6f4e37]"
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          className="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-[#6f4e37]"
+        />
+
+        <button
+          onClick={handleSignup}
+          className="w-full py-3 bg-[#6f4e37] text-white rounded-lg hover:bg-[#5a3d2b] transition"
+        >
+          Sign Up
+        </button>
+
+        <p className="text-center mt-4 text-sm text-gray-600">
+          Already have an account?{" "}
+          <span
+            onClick={() => navigate("/")}
+            className="text-blue-500 cursor-pointer hover:underline"
+          >
+            Login
+          </span>
+        </p>
+
       </div>
     </div>
   );

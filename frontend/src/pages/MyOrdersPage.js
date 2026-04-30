@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 function MyOrdersPage() {
   const [orders, setOrders] = useState([]);
 
+  // ✅ FIX: store user in state (stable)
   const [user] = useState(() =>
     JSON.parse(localStorage.getItem("user") || "null")
   );
@@ -22,8 +23,9 @@ function MyOrdersPage() {
     const interval = setInterval(fetchOrders, 5000); // slower
 
     return () => clearInterval(interval);
-  }, [user]);
+  }, [user]); // ✅ now stable
 
+  // 🎨 STATUS STYLE
   const getStatusStyle = (status) => {
     switch (status) {
       case "Pending": return { background: "#ffe0b2", color: "#e65100" };
@@ -36,14 +38,15 @@ function MyOrdersPage() {
     }
   };
 
+  // 💬 STATUS MESSAGE
   const getStatusMessage = (status) => {
     switch (status) {
       case "Pending": return "Your order has been placed ☕";
-      case "Accepted": return "Your order has been accepted";
-      case "In Progress": return "Your coffee is being prepared ";
-      case "Ready for Collection": return "Ready for pickup ";
-      case "Collected": return "Enjoy your coffee ";
-      case "Cancelled": return "Order cancelled ";
+      case "Accepted": return "Barista accepted your order 👨‍🍳";
+      case "In Progress": return "Your coffee is being prepared 🔥";
+      case "Ready for Collection": return "Ready for pickup ✅";
+      case "Collected": return "Enjoy your coffee 🎉";
+      case "Cancelled": return "Order cancelled ❌";
       default: return "";
     }
   };
@@ -54,7 +57,7 @@ function MyOrdersPage() {
       background: "#f5f1eb",
       minHeight: "100vh"
     }}>
-      <h1 style={{ textAlign: "center" }}> My Orders</h1>
+      <h1 style={{ textAlign: "center" }}>📦 My Orders</h1>
 
       {!user && (
         <p style={{ textAlign: "center", color: "red" }}>

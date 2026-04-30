@@ -6,6 +6,7 @@ public class LoginResult {
     private String message;
     private Object customer;
 
+
     public LoginResult(boolean success, String message, Object customer) {
         this.success = success;
         this.message = message;

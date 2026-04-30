@@ -33,8 +33,6 @@ public class CustomerLoginController {
             return new LoginResult(false, "Email already exists", null);
         }
 
-        Customer saved = loginService.register(customer);
-
-        return new LoginResult(true, "Signup successful", saved);
+        return loginService.signup(customer);
     }
 }

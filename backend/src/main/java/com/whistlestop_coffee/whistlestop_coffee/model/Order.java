@@ -1,5 +1,6 @@
 package com.whistlestop_coffee.whistlestop_coffee.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class Order {
     private Customer customer;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties({"order"})
     private List<OrderItem> items = new ArrayList<>();
 
     // getters & setters

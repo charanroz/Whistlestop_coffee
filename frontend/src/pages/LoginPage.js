@@ -40,10 +40,12 @@ function LoginPage() {
         return;
       }
 
+      const user = data.customer || data.staff;
+
       localStorage.setItem(
         "user",
         JSON.stringify({
-          ...data.customer,
+          ...user,
           role
         })
       );
@@ -61,27 +63,17 @@ function LoginPage() {
   };
 
   return (
-    <div style={{
-      height: "100vh",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      background: "#f5f1eb"
-    }}>
-      <div style={{
-        background: "white",
-        padding: "40px",
-        borderRadius: "15px",
-        width: "300px",
-        textAlign: "center"
-      }}>
-        <h2>☕ Whistlestop</h2>
+    <div className="min-h-screen flex items-center justify-center bg-[#f5f1eb]">
+      <div className="bg-white p-8 rounded-2xl shadow-xl w-[350px]">
 
-        {/* KEEP ONLY ONE ROLE SELECT */}
+        <h1 className="text-2xl font-bold text-center mb-6">
+          ☕ Whistlestop
+        </h1>
+
         <select
           value={role}
           onChange={e => setRole(e.target.value)}
-          style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
+          className="w-full p-3 border rounded-lg mb-3"
         >
           <option value="CUSTOMER">Customer</option>
           <option value="STAFF">Staff</option>
@@ -90,34 +82,28 @@ function LoginPage() {
         <input
           placeholder="Email"
           onChange={e => setEmail(e.target.value)}
-          style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
+          className="w-full p-3 border rounded-lg mb-3"
         />
 
         <input
           type="password"
           placeholder="Password"
           onChange={e => setPassword(e.target.value)}
-          style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
+          className="w-full p-3 border rounded-lg mb-4"
         />
 
         <button
           onClick={handleLogin}
-          style={{
-            width: "100%",
-            padding: "12px",
-            background: "#6f4e37",
-            color: "white",
-            borderRadius: "10px"
-          }}
+          className="w-full py-3 bg-[#6f4e37] text-white rounded-lg hover:bg-[#5a3d2b]"
         >
           Login
         </button>
 
-        <p style={{ marginTop: "10px" }}>
+        <p className="text-center mt-4 text-sm">
           New user?{" "}
           <span
             onClick={() => navigate("/signup")}
-            style={{ color: "blue", cursor: "pointer" }}
+            className="text-blue-500 cursor-pointer"
           >
             Signup
           </span>

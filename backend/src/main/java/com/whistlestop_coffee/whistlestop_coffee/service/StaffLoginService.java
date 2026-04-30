@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.whistlestop_coffee.whistlestop_coffee.dto.LoginResult;
 
+import java.util.List;
+
 @Service
 public class StaffLoginService {
 
@@ -14,11 +16,13 @@ public class StaffLoginService {
 
     public LoginResult login(String email, String password) {
 
-        Staff staff = repository.findByEmail(email).orElse(null);
+        List<Staff> staffList = repository.findAllByEmail(email);
 
-        if (staff == null) {
+        if (staffList.isEmpty()) {
             return new LoginResult(false, "Staff not found", null);
         }
+
+        Staff staff = staffList.get(0);
 
         if (!staff.getPassword().equals(password)) {
             return new LoginResult(false, "Incorrect password", null);

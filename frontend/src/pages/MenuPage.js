@@ -203,15 +203,24 @@ function MenuPage() {
         body: JSON.stringify(order)
       });
 
-      if (!res.ok) throw new Error();
+      const text = await res.text();   // 👈 get real response
 
-      const data = await res.json();
+      if (!res.ok) {
+        console.error("Backend error:", text);  // 🔥 SEE ERROR
+        alert(text);
+        return;
+      }
+
+      const data = JSON.parse(text);
+
+      console.log("SUCCESS:", data);
 
       setCart([]);
       navigate(`/checkout/${data.id}`);
 
-    } catch {
-      alert("Failed to place order");
+    } catch (err) {
+      console.error("Network error:", err);
+      alert("Failed to connect to server");
     }
   };
 

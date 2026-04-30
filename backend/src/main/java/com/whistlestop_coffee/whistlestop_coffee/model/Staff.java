@@ -11,6 +11,7 @@ public class Staff {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     private String name;
     private String email;
     private String password;
@@ -19,6 +20,12 @@ public class Staff {
 
     public Staff(int id, String name, String email, String password) {
         this.id = id;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
+
+    public Staff(String name, String email, String password) {
         this.name = name;
         this.email = email;
         this.password = password;

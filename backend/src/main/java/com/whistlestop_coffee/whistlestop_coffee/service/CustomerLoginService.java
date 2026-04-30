@@ -12,7 +12,7 @@ public class CustomerLoginService {
     @Autowired
     private CustomerRepository repository;
 
-    //  LOGIN
+    // LOGIN
     public LoginResult login(String email, String password) {
 
         if (email == null || email.trim().isEmpty()) {
@@ -36,37 +36,31 @@ public class CustomerLoginService {
         return new LoginResult(true, "Login successful", customer);
     }
 
-    // SIGNUP CREATE NEW USER
-    public LoginResult signup(String name, String email, String password) {
+    // ✅ SINGLE SIGNUP METHOD
+    public LoginResult signup(Customer customer) {
 
-        if (name == null || name.trim().isEmpty()) {
+        if (customer.getName() == null || customer.getName().trim().isEmpty()) {
             return new LoginResult(false, "Name cannot be empty", null);
         }
 
-        if (email == null || email.trim().isEmpty()) {
+        if (customer.getEmail() == null || customer.getEmail().trim().isEmpty()) {
             return new LoginResult(false, "Email cannot be empty", null);
         }
 
-        if (password == null || password.trim().isEmpty()) {
+        if (customer.getPassword() == null || customer.getPassword().trim().isEmpty()) {
             return new LoginResult(false, "Password cannot be empty", null);
         }
 
-        // check if already exists
-        if (repository.findByEmail(email.trim()).isPresent()) {
+        if (repository.findByEmail(customer.getEmail().trim()).isPresent()) {
             return new LoginResult(false, "Email already exists", null);
         }
 
-        Customer customer = new Customer(name, email, password);
-        repository.save(customer);
+        Customer saved = repository.save(customer);
 
-        return new LoginResult(true, "Signup successful", customer);
+        return new LoginResult(true, "Signup successful", saved);
     }
 
     public boolean existsByEmail(String email) {
         return repository.findByEmail(email).isPresent();
-    }
-
-    public Customer register(Customer customer) {
-        return repository.save(customer);
     }
 }

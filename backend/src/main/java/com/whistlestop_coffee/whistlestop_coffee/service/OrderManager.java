@@ -21,6 +21,10 @@ public class OrderManager {
     @Autowired
     private MenuItemRepository menuItemRepository;
 
+    // ✅ FIX: add this (important)
+    @Autowired
+    private CustomerRepository customerRepository;
+
     private final List<String> validStatuses = Arrays.asList(
             "Pending",
             "Accepted",
@@ -30,8 +34,8 @@ public class OrderManager {
             "Cancelled"
     );
 
-    // ARCHIVE instead of DELETE
-    @Scheduled(cron = "0 0 23 * * ?") // 11 PM daily
+    // 📦 ARCHIVE instead of DELETE
+    @Scheduled(cron = "0 0 23 * * ?")
     public void archiveCompletedOrders() {
 
         List<Order> orders = orderRepository.findByStatusIn(
@@ -47,21 +51,28 @@ public class OrderManager {
         System.out.println("📦 Archived collected & cancelled orders");
     }
 
-    //  CREATE ORDER WITH TOTAL
+    // ✅ CREATE ORDER (FIXED)
     public Order createOrder(Order order) {
 
+        Customer dbCustomer = customerRepository
+                .findById(order.getCustomer().getId())
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        order.setCustomer(dbCustomer);
         order.setStatus("Pending");
 
         BigDecimal total = BigDecimal.ZERO;
 
         for (OrderItem item : order.getItems()) {
 
-            MenuItem menuItem = menuItemRepository.findById(
-                    item.getMenuItemId()
-            ).orElseThrow(() -> new RuntimeException("Menu item not found"));
+            Integer menuItemId = item.getMenuItemId();
+
+            MenuItem menuItem = menuItemRepository.findById(menuItemId)
+                    .orElseThrow(() -> new RuntimeException("Menu item not found"));
 
             item.setMenuItem(menuItem);
 
+            // ✅ MOVE THIS INSIDE LOOP
             BigDecimal price;
 
             if ("Large".equalsIgnoreCase(item.getSize())) {
@@ -86,7 +97,7 @@ public class OrderManager {
         return orderRepository.save(order);
     }
 
-    //  ADD ITEM TO ORDER
+    // ➕ ADD ITEM TO ORDER
     public void addItemToOrder(int orderId, OrderItem item) {
 
         Order order = orderRepository.findById(orderId)
@@ -110,7 +121,6 @@ public class OrderManager {
 
         order.getItems().add(item);
 
-        //  recalculate total
         BigDecimal total = order.getItems().stream()
                 .map(i -> i.getUnitPrice().multiply(BigDecimal.valueOf(i.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -120,22 +130,22 @@ public class OrderManager {
         orderRepository.save(order);
     }
 
-    //  GET ALL
+    // 📋 GET ALL
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
     }
 
-    //  GET BY ID
+    // 🔍 GET BY ID
     public Order getOrderById(int id) {
         return orderRepository.findById(id).orElse(null);
     }
 
-    //  GET BY CUSTOMER
+    // 👤 GET BY CUSTOMER
     public List<Order> getOrdersByCustomer(int customerId) {
         return orderRepository.findByCustomerId(customerId);
     }
 
-    //  ACTIVE ORDERS (hide completed)
+    // 🚀 ACTIVE ORDERS
     public List<Order> getActiveOrders() {
         return orderRepository.findByArchivedFalse()
                 .stream()
@@ -144,12 +154,12 @@ public class OrderManager {
                 .toList();
     }
 
-    //  ARCHIVED ORDERS
+    // 🗂 ARCHIVED
     public List<Order> getArchivedOrders() {
         return orderRepository.findByArchivedTrue();
     }
 
-    //  UPDATE STATUS
+    // 🔄 UPDATE STATUS
     public boolean updateStatus(int id, String status) {
         if (!validStatuses.contains(status)) return false;
 
@@ -161,7 +171,7 @@ public class OrderManager {
         return true;
     }
 
-    //  CUSTOMER CANCEL
+    // ❌ CUSTOMER CANCEL
     public boolean cancelOrder(int id, String reason) {
 
         Order order = orderRepository.findById(id).orElse(null);
@@ -186,7 +196,7 @@ public class OrderManager {
         return true;
     }
 
-    //  STAFF CANCEL
+    // 🧑‍🍳 STAFF CANCEL
     public void staffCancelOrder(int id, String reason) {
 
         Order order = orderRepository.findById(id)
@@ -198,7 +208,7 @@ public class OrderManager {
         orderRepository.save(order);
     }
 
-    //  MANUAL ARCHIVE
+    // 📦 MANUAL ARCHIVE
     public void archiveOrder(int id) {
 
         Order order = orderRepository.findById(id).orElse(null);
