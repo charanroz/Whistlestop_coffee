@@ -19,6 +19,9 @@ public class Order {
     private boolean archived;
     private String cancelReason;
 
+    private String trainId;
+    private String estimatedArrivalTime;
+
     private BigDecimal total;
 
     @ManyToOne
@@ -47,6 +50,12 @@ public class Order {
 
     public BigDecimal getTotal() { return total; }
     public void setTotal(BigDecimal total) { this.total = total; }
+
+    public String getTrainId() { return trainId; }
+    public void setTrainId(String trainId) { this.trainId = trainId; }
+
+    public String getEstimatedArrivalTime() { return estimatedArrivalTime; }
+    public void setEstimatedArrivalTime(String estimatedArrivalTime) { this.estimatedArrivalTime = estimatedArrivalTime; }
 
     public Customer getCustomer() { return customer; }
     public void setCustomer(Customer customer) { this.customer = customer; }

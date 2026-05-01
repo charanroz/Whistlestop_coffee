@@ -98,6 +98,13 @@ function MyOrdersPage() {
           <p>{getStatusMessage(order.status)}</p>
 
           <p><strong>Pickup:</strong> {order.pickupTime}</p>
+          {order.trainId && (
+            <p style={{ color: "#e65100", fontWeight: "bold" }}>
+              🚆 Train: {order.trainId}
+              <br />
+              ⏳ Est. Arrival: {order.estimatedArrivalTime}
+            </p>
+          )}
         </div>
       ))}
     </div>

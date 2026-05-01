@@ -94,6 +94,13 @@ function OrdersPage() {
             </span>
 
             <p><strong>Pickup:</strong> {order.pickupTime}</p>
+            {order.trainId && (
+              <p style={{ color: "#e65100", fontWeight: "bold" }}>
+                🚆 Train: {order.trainId}
+                <br />
+                ⏳ Est. Arrival: {order.estimatedArrivalTime}
+              </p>
+            )}
 
             <ul>
               {order.items?.map((item, i) => (
