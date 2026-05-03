@@ -72,8 +72,6 @@ function OrdersPage() {
             borderRadius: "20px",
             padding: "20px",
             boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
-
-            //highlight READY orders
             border:
               order.status === "Ready for Collection"
                 ? "3px solid green"
@@ -106,7 +104,8 @@ function OrdersPage() {
               {order.items?.map((item, i) => (
                 <li key={i}>
                   {item.menuItem?.name} ({item.size}) x{item.quantity}
-                  - £{item.price}
+                  {/* ✅ แก้จาก item.price เป็น item.unitPrice */}
+                  - £{item.unitPrice?.toFixed(2)}
                 </li>
               ))}
             </ul>
@@ -137,7 +136,8 @@ function OrdersPage() {
                 Ready
               </button>
 
-              <p><strong>Total: £{order.totalPrice?.toFixed(2)}</strong></p>
+              {/* ✅ แก้จาก order.totalPrice เป็น order.total */}
+              <p><strong>Total: £{order.total?.toFixed(2)}</strong></p>
 
               <button
                 style={buttonStyle}
