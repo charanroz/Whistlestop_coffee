@@ -39,8 +39,13 @@ public class OrderController {
 
     //  CREATE ORDER
     @PostMapping
-    public Order createOrder(@RequestBody Order order) {
-        return orderManager.createOrder(order);
+    public ResponseEntity<?> createOrder(@RequestBody Order order) {
+        try {
+            Order created = orderManager.createOrder(order);
+            return ResponseEntity.ok(created);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     //  ADD ITEM

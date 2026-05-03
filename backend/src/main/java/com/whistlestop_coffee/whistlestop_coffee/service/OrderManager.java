@@ -25,6 +25,9 @@ public class OrderManager {
     @Autowired
     private CustomerRepository customerRepository;
 
+    @Autowired
+    private BusinessHourManager businessHourManager;
+
     private final List<String> validStatuses = Arrays.asList(
             "Pending",
             "Accepted",
@@ -57,6 +60,26 @@ public class OrderManager {
         Customer dbCustomer = customerRepository
                 .findById(order.getCustomer().getId())
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        // Validate Business Hours
+        String timeStr = order.getPickupTime();
+        if (timeStr != null) {
+            String timeOnly = timeStr;
+            String dayOfWeek = java.time.LocalDate.now().getDayOfWeek().getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.ENGLISH);
+            
+            if (timeStr.contains(" ")) {
+                String[] parts = timeStr.split(" ");
+                try {
+                    dayOfWeek = java.time.LocalDate.parse(parts[0]).getDayOfWeek().getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.ENGLISH);
+                    timeOnly = parts[1];
+                } catch (Exception e) {
+                    timeOnly = parts[1];
+                }
+            }
+            if (!businessHourManager.isWithinBusinessHours(dayOfWeek, timeOnly)) {
+                throw new RuntimeException("outofbusinesshours");
+            }
+        }
 
         order.setCustomer(dbCustomer);
         order.setStatus("Pending");

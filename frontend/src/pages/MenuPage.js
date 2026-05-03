@@ -197,6 +197,14 @@ function MenuPage() {
       alert("This train is cancelled. Please select another."); return;
     }
 
+    if (pickupType === "train") {
+      const arrTime = selectedTrain.estimatedArrivalTime;
+      if (!todayHours || todayHours.closed || arrTime < todayHours.openTime || arrTime > todayHours.closeTime) {
+        alert("outofbusinesshours");
+        return;
+      }
+    }
+
     const pickupDateTime = `${getPickupDate()} ${pickupTime}`;
 
     const order = {
