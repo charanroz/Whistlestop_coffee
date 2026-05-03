@@ -13,8 +13,7 @@ build/
 .idea/
 .vscode/
 
-# Sensitive config — each developer uses their own copy
-backend/src/main/resources/application.properties
+# application.properties is committed intentionally (shared project credentials)
 
 # H2 database files
 data/
