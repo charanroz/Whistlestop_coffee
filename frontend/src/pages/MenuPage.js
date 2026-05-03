@@ -85,23 +85,55 @@ function MenuPage() {
     currentTime >= todayHours.openTime &&
     currentTime <= todayHours.closeTime;
 
-  // time slots
+  // ✅ NEW: หาวันถัดไปที่เปิด
+  const getNextOpenDay = () => {
+    const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    let i = new Date().getDay();
+    for (let x = 1; x <= 7; x++) {
+      const next = days[(i + x) % 7];
+      const found = hours.find(h => h.dayOfWeek === next && !h.closed);
+      if (found) return { hours: found, daysAhead: x };
+    }
+    return null;
+  };
+
+  // ✅ NEW: หาวันที่ของ pickup (วันนี้หรือวันถัดไปที่เปิด)
+  const getPickupDate = () => {
+    if (!todayHours || todayHours.closed) {
+      const next = getNextOpenDay();
+      if (next) {
+        const d = new Date();
+        d.setDate(d.getDate() + next.daysAhead);
+        return d.toISOString().split("T")[0];
+      }
+    }
+    return new Date().toISOString().split("T")[0];
+  };
+
+  // ✅ UPDATED: time slots — ถ้าวันนี้ปิด ใช้วันถัดไปที่เปิด
   const timeSlots = useMemo(() => {
-    if (!todayHours || todayHours.closed || !todayHours.openTime) return [];
+    const next = getNextOpenDay();
+    const target = (!todayHours || todayHours.closed) ? next?.hours : todayHours;
+    if (!target || !target.openTime) return [];
     const slots = [];
-    let [hour, minute] = todayHours.openTime.split(":").map(Number);
-    const [closeHour, closeMinute] = todayHours.closeTime.split(":").map(Number);
+    let [hour, minute] = target.openTime.split(":").map(Number);
+    const [closeHour, closeMinute] = target.closeTime.split(":").map(Number);
     while (hour < closeHour || (hour === closeHour && minute <= closeMinute)) {
       const time = `${String(hour).padStart(2,"0")}:${String(minute).padStart(2,"0")}`;
-      if (!isOpenNow || time >= currentTime) slots.push(time);
+      // ถ้าวันนี้เปิดและร้านเปิดอยู่ ให้กรองเวลาที่ผ่านไปแล้วออก
+      if (todayHours && !todayHours.closed && isOpenNow) {
+        if (time >= currentTime) slots.push(time);
+      } else {
+        slots.push(time);
+      }
       minute += 5;
       if (minute >= 60) { minute = 0; hour++; }
     }
     return slots;
-  }, [todayHours, currentTime, isOpenNow]);
+  }, [todayHours, hours, currentTime, isOpenNow]);
 
   useEffect(() => {
-    if (timeSlots.length > 0) setPickupTime(prev => prev || timeSlots[0]);
+    if (timeSlots.length > 0) setPickupTime(timeSlots[0]);
   }, [timeSlots]);
 
   const formatTime = (time) => {
@@ -164,11 +196,14 @@ function MenuPage() {
       alert("This train is cancelled. Please select another."); return;
     }
 
+    // ✅ UPDATED: ส่ง pickupTime พร้อมวันที่ด้วย เช่น "2026-05-04 06:30"
+    const pickupDateTime = `${getPickupDate()} ${pickupTime}`;
+
     const order = {
       customer: { id: user.id },
-      pickupTime: pickupType === "train" ? selectedTrain.estimatedArrivalTime : pickupTime,
+      pickupTime: pickupType === "train" ? selectedTrain.estimatedArrivalTime : pickupDateTime,
       trainId: pickupType === "train" ? selectedTrain.trainId : null,
-      estimatedArrivalTime: pickupType === "train" ? selectedTrain.estimatedArrivalTime : pickupTime,
+      estimatedArrivalTime: pickupType === "train" ? selectedTrain.estimatedArrivalTime : pickupDateTime,
       items: cart.map(i => ({ menuItemId: i.id, size: i.size, quantity: i.quantity }))
     };
 
@@ -185,6 +220,15 @@ function MenuPage() {
     } catch { alert("Failed to connect to server"); }
   };
 
+  // ✅ NEW: label บอกว่า pre-order สำหรับวันไหน
+  const preOrderLabel = () => {
+    if (!todayHours || todayHours.closed) {
+      const next = getNextOpenDay();
+      if (next) return `Pre-order for ${next.hours.dayOfWeek} ${next.hours.openTime}–${next.hours.closeTime}`;
+    }
+    return null;
+  };
+
   return (
     <div style={{ background: "#f5f1eb", minHeight: "100vh", padding: "24px 24px 40px", fontFamily: "'Segoe UI', sans-serif" }}>
 
@@ -196,9 +240,11 @@ function MenuPage() {
           </h1>
           {todayHours && (
             <p style={{ margin: "4px 0 0", fontSize: "13px", color: isOpenNow ? "#16a34a" : "#ea580c" }}>
-              {todayHours.closed ? "Closed today — pre-orders available"
-                : isOpenNow ? `Open · ${todayHours.openTime}–${todayHours.closeTime}`
-                : `Closed · Pre-order for ${todayHours.openTime}`}
+              {todayHours.closed
+                ? `Closed today — ${preOrderLabel() || "pre-orders available"}`
+                : isOpenNow
+                  ? `Open · ${todayHours.openTime}–${todayHours.closeTime}`
+                  : `Closed · Pre-order for ${todayHours.openTime}`}
             </p>
           )}
         </div>
@@ -283,10 +329,18 @@ function MenuPage() {
 
           {/* TIME PICKER */}
           {pickupType === "time" && (
-            <select value={pickupTime} onChange={e => setPickupTime(e.target.value)}
-              style={{ width: "100%", padding: "8px", borderRadius: "8px", border: "1px solid #d1d5db", marginBottom: "4px", fontSize: "13px" }}>
-              {timeSlots.map(t => <option key={t} value={t}>{formatTime(t)}</option>)}
-            </select>
+            <div>
+              {/* ✅ NEW: แสดง label ถ้าเป็น pre-order */}
+              {preOrderLabel() && (
+                <p style={{ fontSize: "11px", color: "#ea580c", marginBottom: "6px" }}>
+                  📅 {preOrderLabel()}
+                </p>
+              )}
+              <select value={pickupTime} onChange={e => setPickupTime(e.target.value)}
+                style={{ width: "100%", padding: "8px", borderRadius: "8px", border: "1px solid #d1d5db", marginBottom: "4px", fontSize: "13px" }}>
+                {timeSlots.map(t => <option key={t} value={t}>{formatTime(t)}</option>)}
+              </select>
+            </div>
           )}
 
           {/* TRAIN CARD PICKER */}
