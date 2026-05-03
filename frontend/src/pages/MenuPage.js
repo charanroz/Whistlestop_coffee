@@ -144,6 +144,13 @@ function MenuPage() {
     } catch { return 0; }
   };
 
+  // Check whether a train's estimated arrival is within today's business hours
+  const isTrainWithinBusinessHours = (train) => {
+    if (!train?.estimatedArrivalTime || !todayHours || todayHours.closed) return false;
+    const arrival = train.estimatedArrivalTime;
+    return arrival >= todayHours.openTime && arrival <= todayHours.closeTime;
+  };
+
   const getStatusBadge = (train) => {
     if (train.status === "Cancelled") return { bg: "#ef4444", label: "Cancelled" };
     const delay = getDelayMinutes(train);
@@ -186,6 +193,17 @@ function MenuPage() {
     if (pickupType === "train" && !selectedTrain) { alert("Please select a train"); return; }
     if (pickupType === "train" && selectedTrain?.status === "Cancelled") {
       alert("This train is cancelled. Please select another."); return;
+    }
+    if (pickupType === "train" && selectedTrain && !isTrainWithinBusinessHours(selectedTrain)) {
+      const open  = todayHours?.openTime  || "N/A";
+      const close = todayHours?.closeTime || "N/A";
+      const closed = !todayHours || todayHours.closed;
+      if (closed) {
+        alert("🚫 We are closed today. Please select a different pickup option.");
+      } else {
+        alert(`🚫 Not within business hours\n\nThis train arrives at ${selectedTrain.estimatedArrivalTime}, but we are only open ${open}–${close} today.\n\nPlease choose a train that arrives during opening hours.`);
+      }
+      return;
     }
 
    // ✅ UPDATED: ส่ง pickupTime พร้อมวันที่ด้วย เช่น "2026-05-04 06:30"
@@ -389,6 +407,30 @@ function MenuPage() {
                   {getDelayMinutes(selectedTrain) > 0 && (
                     <div className="text-orange-600 mt-1 font-medium">
                       ⚠️ Delayed +{getDelayMinutes(selectedTrain)} min · we'll adjust your order
+                    </div>
+                  )}
+                  {!isTrainWithinBusinessHours(selectedTrain) && (
+                    <div style={{
+                      marginTop: "8px",
+                      background: "#fef2f2",
+                      border: "1px solid #fca5a5",
+                      borderRadius: "8px",
+                      padding: "8px 10px",
+                      color: "#b91c1c",
+                      fontWeight: "600",
+                      lineHeight: "1.4"
+                    }}>
+                      🚫 Outside business hours
+                      {todayHours && !todayHours.closed && (
+                        <div style={{ fontWeight: "400", color: "#dc2626", marginTop: "3px" }}>
+                          We are open {todayHours.openTime}–{todayHours.closeTime}
+                        </div>
+                      )}
+                      {(!todayHours || todayHours.closed) && (
+                        <div style={{ fontWeight: "400", color: "#dc2626", marginTop: "3px" }}>
+                          We are closed today
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
