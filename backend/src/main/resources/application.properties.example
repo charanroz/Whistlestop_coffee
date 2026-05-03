@@ -3,15 +3,14 @@
 #  Copy this file and rename it to: application.properties
 #  (in the same folder as this file)
 #
-#  To run WITHOUT Kafka (recommended for local dev):
-#    Set spring.autoconfigure.exclude below (already done in the
-#    "LOCAL DEV" block). You will get mock train data automatically.
+#  To run WITHOUT Kafka (quick local test, mock train data):
+#    Keep spring.autoconfigure.exclude line below.
 #
-#  To run WITH live Network Rail data:
-#    Fill in your own RDM credentials and remove the exclude line.
+#  To run WITH live Network Rail data (Darwin + NWR Train Movements):
+#    Comment out the exclude line and fill in the Kafka credentials.
 # ════════════════════════════════════════════════════════════════════
 
-# ── Database (H2 file-based, no setup required) ──────────────────────
+# ── Database (H2 file-based, no setup needed) ─────────────────────
 spring.datasource.url=jdbc:h2:file:./data/whistlestop
 spring.datasource.driver-class-name=org.h2.Driver
 spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
@@ -24,28 +23,27 @@ spring.jpa.show-sql=true
 spring.sql.init.mode=never
 spring.jpa.defer-datasource-initialization=true
 
-# ── LOCAL DEV: Disable Kafka so you don't need NWR credentials ───────
-# Remove or comment out this line only if you have real NWR credentials
+# ── LOCAL DEV: disable Kafka (mock train data will be shown) ──────
+# Comment out this line if you have NWR credentials for live data
 spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
 
-# ── Kafka (Confluent Cloud) — only needed for live train data ─────────
-# Leave these blank if you disabled Kafka above (mock data will be used)
-spring.kafka.bootstrap-servers=
-spring.kafka.consumer.group-id=
+# ── Kafka (Confluent Cloud) ── NWR Train Movements ────────────────
+# Provides real-time delay updates for trains at Cramlington
+spring.kafka.bootstrap-servers=pkc-z3p1v0.europe-west2.gcp.confluent.cloud:9092
+spring.kafka.consumer.group-id=SC-76e927e6-1302-4b71-9f73-8a9d8a8e0f4b
 spring.kafka.consumer.auto-offset-reset=latest
 spring.kafka.consumer.key-deserializer=org.apache.kafka.common.serialization.StringDeserializer
 spring.kafka.consumer.value-deserializer=org.apache.kafka.common.serialization.StringDeserializer
 spring.kafka.properties.security.protocol=SASL_SSL
 spring.kafka.properties.sasl.mechanism=PLAIN
-spring.kafka.properties.sasl.jaas.config=
+spring.kafka.properties.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="MPVRUX4QR3QC53FR" password="cfltNr0mqGB0+O6nrvfOsTx78vF/UR5Pi8j4aW3UDae0tl5opgC91bPpRLdXAWNg";
 
-# ── Cramlington Station Codes ─────────────────────────────────────────
+# ── Kafka ── Darwin Push Port (live timetable + real-time status) ─
+# Provides today's Cramlington train schedule + real-time status updates
+nwr.schedule.kafka.group-id=SC-7336bcc5-349a-41bd-9421-de24273d4a52
+nwr.schedule.kafka.topic=prod-1010-Darwin-Train-Information-Push-Port-IIII2_0-JSON
+
+# ── Cramlington Station Codes ─────────────────────────────────────
 networkrail.cramlington.stanox=12136
 networkrail.cramlington.tiploc=CRMLNGT
 networkrail.cramlington.crs=CRM
-
-# ── RDM Schedule (optional, only for live schedule data) ─────────────
-rdm.username=
-rdm.password=
-rdm.schedule.dsCode=
-rdm.schedule.dataProductCode=

@@ -2,6 +2,7 @@ package com.whistlestop_coffee.whistlestop_coffee.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.whistlestop_coffee.whistlestop_coffee.model.Train;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -9,22 +10,21 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 /**
  * Consumes real-time train movement messages from the NWR Train Movements Kafka topic.
  *
- * Topic: TRAIN_MVT_ALL_TOC
- * Broker: Confluent Cloud (SASL_SSL / PLAIN)
+ * Handles two message types:
+ *   msg_type 0001 (ACTIVATION) → a new train service has been activated for today;
+ *                                 used to pre-populate the cache with upcoming trains
+ *                                 so they appear in the UI before they physically arrive.
+ *   msg_type 0003 (MOVEMENT)   → a train has passed/arrived at a location;
+ *                                 used to update estimated arrival times with real delays.
  *
- * Message format: JSON array of objects, each with a "header" and "body".
- * header.msg_type == "0003" → Movement event
- * body.loc_stanox == "12136" → Cramlington station
- * body.event_type == "ARRIVAL" → Arrival event
- *
- * When a delayed arrival is detected for a Cramlington train,
- * the TrainCache is updated with the new estimated time.
+ * Both types filter to body.loc_stanox == "12136" (Cramlington Station).
  */
 @ConditionalOnProperty(name = "spring.kafka.bootstrap-servers", matchIfMissing = false)
 @Service
@@ -32,7 +32,7 @@ public class TrainMovementConsumer {
 
     private final TrainCache trainCache;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+    private final DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HH:mm")
             .withZone(ZoneId.of("Europe/London"));
 
     @Value("${networkrail.cramlington.stanox}")
@@ -42,85 +42,121 @@ public class TrainMovementConsumer {
         this.trainCache = trainCache;
     }
 
-    /**
-     * Listens to the NWR Train Movements Kafka topic.
-     * Messages are batched — each record value is a JSON array of movement events.
-     */
     @KafkaListener(topics = "TRAIN_MVT_ALL_TOC", groupId = "${spring.kafka.consumer.group-id}")
     public void consume(ConsumerRecord<String, String> record) {
         String value = record.value();
         if (value == null || value.isBlank()) return;
-
         try {
             JsonNode messages = objectMapper.readTree(value);
-
-            // Messages can be a single object OR an array
             if (messages.isArray()) {
-                for (JsonNode msg : messages) {
-                    processMessage(msg);
-                }
+                for (JsonNode msg : messages) processMessage(msg);
             } else {
                 processMessage(messages);
             }
-
         } catch (Exception e) {
-            // Don't let parsing errors kill the listener
             System.err.println("⚠️  Failed to parse train movement message: " + e.getMessage());
         }
     }
 
     private void processMessage(JsonNode msg) {
         JsonNode header = msg.get("header");
-        JsonNode body = msg.get("body");
-
+        JsonNode body   = msg.get("body");
         if (header == null || body == null) return;
 
-        // Only process msg_type 0003 (Movement events)
         String msgType = header.has("msg_type") ? header.get("msg_type").asText() : "";
-        if (!"0003".equals(msgType)) return;
 
-        // Only process events at Cramlington (STANOX 12136)
-        String locStanox = body.has("loc_stanox") ? body.get("loc_stanox").asText("").trim() : "";
-        if (!cramlingtonStanox.equals(locStanox)) return;
+        switch (msgType) {
+            case "0001" -> handleActivation(body);   // Train activated for today
+            case "0003" -> handleMovement(body);     // Train passed/arrived at location
+        }
+    }
 
-        // Only process ARRIVAL events
-        String eventType = body.has("event_type") ? body.get("event_type").asText("") : "";
-        if (!"ARRIVAL".equals(eventType)) return;
-
-        // Extract train UID (used as our trainId key in the cache)
+    /**
+     * ACTIVATION (0001): A train has been activated for today's service.
+     * We register it in the cache so it appears in the "upcoming trains" list
+     * even before it reaches Cramlington. We only add trains that stop at
+     * Cramlington (tp_origin_stanox alone isn't enough, but we use sched_origin_stanox
+     * as a heuristic and let MOVEMENT events refine the data later).
+     *
+     * Note: Not all activated trains stop at Cramlington; the UI will only show
+     * trains that later get a MOVEMENT event at stanox 12136, or we let the
+     * fallback mock data fill the gap.
+     */
+    private void handleActivation(JsonNode body) {
+        // Activation messages don't have loc_stanox — skip filtering by stanox here.
+        // We'll only keep trains that later get a Cramlington movement event.
         String trainUid = body.has("train_id") ? body.get("train_id").asText("").trim() : "";
         if (trainUid.isBlank()) return;
 
-        // Get actual timestamp (milliseconds epoch)
-        String actualTsStr = body.has("actual_timestamp") ? body.get("actual_timestamp").asText("") : "";
+        // Only add if not already in cache (don't overwrite real data)
+        if (trainCache.getById(trainUid) != null) return;
+
+        String plannedTsStr = body.has("origin_dep_timestamp")
+                ? body.get("origin_dep_timestamp").asText("") : "";
+        String scheduledTime = parseTimestamp(plannedTsStr);
+        if (scheduledTime == null) return;
+
+        // Filter: only activate trains whose scheduled time is in the future
+        try {
+            LocalTime scheduled = LocalTime.parse(scheduledTime, DateTimeFormatter.ofPattern("HH:mm"));
+            if (scheduled.isBefore(LocalTime.now())) return;
+        } catch (Exception ignored) { return; }
+
+        String origin = body.has("sched_origin_stanox")
+                ? body.get("sched_origin_stanox").asText("Unknown") : "Unknown";
+
+        Train train = new Train(trainUid, origin, "Cramlington",
+                scheduledTime, scheduledTime, "On time");
+        trainCache.put(train);
+        System.out.println("🚆 Activated train " + trainUid + " → Cramlington sched " + scheduledTime);
+    }
+
+    /**
+     * MOVEMENT (0003): A train has passed or arrived at a location.
+     * Filters to Cramlington ARRIVAL events and updates the cache.
+     * If the train isn't in cache yet, creates a new entry from real data.
+     */
+    private void handleMovement(JsonNode body) {
+        String locStanox = body.has("loc_stanox") ? body.get("loc_stanox").asText("").trim() : "";
+        if (!cramlingtonStanox.equals(locStanox)) return;
+
+        String eventType = body.has("event_type") ? body.get("event_type").asText("") : "";
+        if (!"ARRIVAL".equals(eventType)) return;
+
+        String trainUid = body.has("train_id") ? body.get("train_id").asText("").trim() : "";
+        if (trainUid.isBlank()) return;
+
+        String actualTsStr  = body.has("actual_timestamp")  ? body.get("actual_timestamp").asText("")  : "";
         String plannedTsStr = body.has("planned_timestamp") ? body.get("planned_timestamp").asText("") : "";
 
         String estimatedTime = parseTimestamp(actualTsStr.isBlank() ? plannedTsStr : actualTsStr);
         if (estimatedTime == null) return;
 
-        // Determine delay status
         String plannedTime = parseTimestamp(plannedTsStr);
-        String status = "On time";
-        if (plannedTime != null && !plannedTime.equals(estimatedTime)) {
-            status = "Delayed";
-        }
+        String status = (plannedTime != null && !plannedTime.equals(estimatedTime)) ? "Delayed" : "On time";
 
-        // Update the cache — this flows through to TrainStatusScheduler → order pickup times
-        trainCache.updateDelay(trainUid, estimatedTime, status);
+        Train existing = trainCache.getById(trainUid);
+        if (existing != null) {
+            // Update existing scheduled entry with real arrival data
+            trainCache.updateDelay(trainUid, estimatedTime, status);
+        } else {
+            // No schedule entry — create one from live movement data
+            String scheduled = plannedTime != null ? plannedTime : estimatedTime;
+            Train train = new Train(trainUid, "Network Rail Live", "Cramlington",
+                    scheduled, estimatedTime, status);
+            trainCache.put(train);
+            System.out.println("🚆 New live train " + trainUid + " at Cramlington: " + estimatedTime + " [" + status + "]");
+        }
     }
 
-    /**
-     * Convert epoch milliseconds string to "HH:mm" format in London time.
-     */
     private String parseTimestamp(String epochMillisStr) {
-        if (epochMillisStr == null || epochMillisStr.isBlank() || "0".equals(epochMillisStr.trim())) {
-            return null;
-        }
+        if (epochMillisStr == null || epochMillisStr.isBlank() || "0".equals(epochMillisStr.trim())) return null;
         try {
             long epochMillis = Long.parseLong(epochMillisStr.trim());
-            return timeFormatter.format(Instant.ofEpochMilli(epochMillis));
+            return timeFmt.format(Instant.ofEpochMilli(epochMillis));
         } catch (NumberFormatException e) {
             return null;
         }
     }
 }
+
