@@ -17,6 +17,7 @@ function MenuPage() {
   const user = JSON.parse(localStorage.getItem("user"));
 
   // redirect if not logged in
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!user) navigate("/");
   }, []);
@@ -45,13 +46,14 @@ function MenuPage() {
     fetch("http://localhost:8080/trains/arrivals?stationName=Cramlington")
       .then(res => res.json())
       .then(data => {
-        setTrains(data);
+        const trainList = Array.isArray(data) ? data : [];
+        setTrains(trainList);
         setTrainsLoading(false);
-        if (data.length > 0) {
+        if (trainList.length > 0) {
           setSelectedTrain(prev => {
-            if (!prev) return data[0];
-            const refreshed = data.find(t => t.trainId === prev.trainId);
-            return refreshed || data[0];
+            if (!prev) return trainList[0];
+            const refreshed = trainList.find(t => t.trainId === prev.trainId);
+            return refreshed || trainList[0];
           });
         }
       })
@@ -84,7 +86,7 @@ function MenuPage() {
     currentTime >= todayHours.openTime &&
     currentTime <= todayHours.closeTime;
 
-// ✅ NEW: หาวันถัดไปที่เปิด
+  // หาวันถัดไปที่เปิด
   const getNextOpenDay = () => {
     const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
     let i = new Date().getDay();
@@ -96,7 +98,7 @@ function MenuPage() {
     return null;
   };
 
-  // ✅ NEW: หาวันที่ของ pickup (วันนี้หรือวันถัดไปที่เปิด)
+  // หาวันที่ของ pickup (วันนี้หรือวันถัดไปที่เปิด)
   const getPickupDate = () => {
     if (!todayHours || todayHours.closed) {
       const next = getNextOpenDay();
@@ -109,23 +111,30 @@ function MenuPage() {
     return new Date().toISOString().split("T")[0];
   };
 
-  // ✅ UPDATED: time slots — ถ้าวันนี้ปิด ใช้วันถัดไปที่เปิด
+  // ✅ FIXED: time slots — ถ้าวันนี้ปิด ใช้วันถัดไปที่เปิด
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const timeSlots = useMemo(() => {
-    if (!todayHours || todayHours.closed || !todayHours.openTime) return [];
+    const next = getNextOpenDay();
+    const target = (!todayHours || todayHours.closed) ? next?.hours : todayHours;
+    if (!target || !target.openTime) return [];
     const slots = [];
-    let [hour, minute] = todayHours.openTime.split(":").map(Number);
-    const [closeHour, closeMinute] = todayHours.closeTime.split(":").map(Number);
+    let [hour, minute] = target.openTime.split(":").map(Number);
+    const [closeHour, closeMinute] = target.closeTime.split(":").map(Number);
     while (hour < closeHour || (hour === closeHour && minute <= closeMinute)) {
       const time = `${String(hour).padStart(2,"0")}:${String(minute).padStart(2,"0")}`;
-      if (!isOpenNow || time >= currentTime) slots.push(time);
+      if (todayHours && !todayHours.closed && isOpenNow) {
+        if (time >= currentTime) slots.push(time);
+      } else {
+        slots.push(time);
+      }
       minute += 5;
       if (minute >= 60) { minute = 0; hour++; }
     }
     return slots;
-  }, [todayHours, currentTime, isOpenNow]);
+  }, [todayHours, hours, currentTime, isOpenNow]);
 
   useEffect(() => {
-    if (timeSlots.length > 0) setPickupTime(prev => prev || timeSlots[0]);
+    if (timeSlots.length > 0) setPickupTime(timeSlots[0]);
   }, [timeSlots]);
 
   const formatTime = (time) => {
@@ -142,13 +151,6 @@ function MenuPage() {
       const [eh, em] = train.estimatedArrivalTime.split(":").map(Number);
       return (eh * 60 + em) - (sh * 60 + sm);
     } catch { return 0; }
-  };
-
-  // Check whether a train's estimated arrival is within today's business hours
-  const isTrainWithinBusinessHours = (train) => {
-    if (!train?.estimatedArrivalTime || !todayHours || todayHours.closed) return false;
-    const arrival = train.estimatedArrivalTime;
-    return arrival >= todayHours.openTime && arrival <= todayHours.closeTime;
   };
 
   const getStatusBadge = (train) => {
@@ -194,26 +196,14 @@ function MenuPage() {
     if (pickupType === "train" && selectedTrain?.status === "Cancelled") {
       alert("This train is cancelled. Please select another."); return;
     }
-    if (pickupType === "train" && selectedTrain && !isTrainWithinBusinessHours(selectedTrain)) {
-      const open  = todayHours?.openTime  || "N/A";
-      const close = todayHours?.closeTime || "N/A";
-      const closed = !todayHours || todayHours.closed;
-      if (closed) {
-        alert("🚫 We are closed today. Please select a different pickup option.");
-      } else {
-        alert(`🚫 Not within business hours\n\nThis train arrives at ${selectedTrain.estimatedArrivalTime}, but we are only open ${open}–${close} today.\n\nPlease choose a train that arrives during opening hours.`);
-      }
-      return;
-    }
 
-   // ✅ UPDATED: ส่ง pickupTime พร้อมวันที่ด้วย เช่น "2026-05-04 06:30"
     const pickupDateTime = `${getPickupDate()} ${pickupTime}`;
 
     const order = {
       customer: { id: user.id },
-      pickupTime: pickupType === "train" ? selectedTrain.estimatedArrivalTime : pickupTime,
+      pickupTime: pickupType === "train" ? selectedTrain.estimatedArrivalTime : pickupDateTime,
       trainId: pickupType === "train" ? selectedTrain.trainId : null,
-      estimatedArrivalTime: pickupType === "train" ? selectedTrain.estimatedArrivalTime : pickupTime,
+      estimatedArrivalTime: pickupType === "train" ? selectedTrain.estimatedArrivalTime : pickupDateTime,
       items: cart.map(i => ({ menuItemId: i.id, size: i.size, quantity: i.quantity }))
     };
 
@@ -230,7 +220,7 @@ function MenuPage() {
     } catch { alert("Failed to connect to server"); }
   };
 
-  // ✅ NEW: label บอกว่า pre-order สำหรับวันไหน
+  // label บอกว่า pre-order สำหรับวันไหน
   const preOrderLabel = () => {
     if (!todayHours || todayHours.closed) {
       const next = getNextOpenDay();
@@ -249,25 +239,27 @@ function MenuPage() {
           </h1>
           {todayHours && (
             <p className={`m-0 mt-1 text-[13px] ${isOpenNow ? "text-green-600" : "text-orange-600"}`}>
-              {todayHours.closed ? "Closed today — pre-orders available"
-                : isOpenNow ? `Open · ${todayHours.openTime}–${todayHours.closeTime}`
-                : `Closed · Pre-order for ${todayHours.openTime}`}
-            </p >
+              {todayHours.closed
+                ? `Closed today — ${preOrderLabel() || "pre-orders available"}`
+                : isOpenNow
+                  ? `Open · ${todayHours.openTime}–${todayHours.closeTime}`
+                  : `Closed · Pre-order for ${todayHours.openTime}`}
+            </p>
           )}
         </div>
       </div>
 
-      {/* BODY: On mobile it's column, on large screens (lg) it's row */}
+      {/* BODY */}
       <div className="flex flex-col lg:flex-row gap-6 max-w-[1200px] mx-auto relative">
 
-        {/* MENU GRID: 2 columns on mobile, 3 on tablet, 4 on large screens */}
+        {/* MENU GRID */}
         <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 content-start">
           {menu.map(item => {
             const size = selectedSizes[item.id] || "Regular";
             const price = size === "Large" ? item.priceLarge : item.priceRegular;
             return (
               <div key={item.id} className="bg-white rounded-2xl overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.07)] flex flex-col">
-                < img src={imageMap[item.name] || "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=500"}
+                <img src={imageMap[item.name] || "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=500"}
                   alt={item.name} className="w-full h-28 sm:h-32 object-cover" />
                 <div className="p-3 flex flex-col flex-1">
                   <div className="font-semibold mb-2 text-[13px] sm:text-[14px] leading-tight flex-1">{item.name}</div>
@@ -302,7 +294,7 @@ function MenuPage() {
           <h2 className="m-0 mb-4 text-[17px]">🛒 Your Order</h2>
 
           {cart.length === 0
-            ? <p className="text-gray-400 text-[13px]">Add items to get started</p >
+            ? <p className="text-gray-400 text-[13px]">Add items to get started</p>
             : cart.map((item, i) => (
               <div key={i} className="flex items-center gap-2 mb-3 text-[13px]">
                 <span className="flex-1 leading-tight">{item.name} <span className="text-gray-400 text-[11px]">({item.size})</span></span>
@@ -334,16 +326,15 @@ function MenuPage() {
           {/* TIME PICKER */}
           {pickupType === "time" && (
             <div>
-              {/* ✅ NEW: แสดงแสดง label ถ้าเป็น pre-order */}
               {preOrderLabel() && (
                 <p style={{ fontSize: "11px", color: "#ea580c", marginBottom: "6px" }}>
                   📅 {preOrderLabel()}
                 </p>
               )}
-             <select value={pickupTime} onChange={e => setPickupTime(e.target.value)}
-               className="w-full p-2 rounded-lg border border-gray-300 mb-1 text-[13px] bg-white">
-               {timeSlots.map(t => <option key={t} value={t}>{formatTime(t)}</option>)}
-             </select>
+              <select value={pickupTime} onChange={e => setPickupTime(e.target.value)}
+                className="w-full p-2 rounded-lg border border-gray-300 mb-1 text-[13px] bg-white">
+                {timeSlots.map(t => <option key={t} value={t}>{formatTime(t)}</option>)}
+              </select>
             </div>
           )}
 
@@ -356,7 +347,7 @@ function MenuPage() {
               </div>
 
               {trains.length === 0 && !trainsLoading && (
-                <p className="text-[12px] text-gray-400 text-center py-3">No upcoming arrivals found</p >
+                <p className="text-[12px] text-gray-400 text-center py-3">No upcoming arrivals found</p>
               )}
 
               <div className="max-h-[300px] overflow-y-auto flex flex-col gap-2 pr-1">
@@ -407,30 +398,6 @@ function MenuPage() {
                   {getDelayMinutes(selectedTrain) > 0 && (
                     <div className="text-orange-600 mt-1 font-medium">
                       ⚠️ Delayed +{getDelayMinutes(selectedTrain)} min · we'll adjust your order
-                    </div>
-                  )}
-                  {!isTrainWithinBusinessHours(selectedTrain) && (
-                    <div style={{
-                      marginTop: "8px",
-                      background: "#fef2f2",
-                      border: "1px solid #fca5a5",
-                      borderRadius: "8px",
-                      padding: "8px 10px",
-                      color: "#b91c1c",
-                      fontWeight: "600",
-                      lineHeight: "1.4"
-                    }}>
-                      🚫 Outside business hours
-                      {todayHours && !todayHours.closed && (
-                        <div style={{ fontWeight: "400", color: "#dc2626", marginTop: "3px" }}>
-                          We are open {todayHours.openTime}–{todayHours.closeTime}
-                        </div>
-                      )}
-                      {(!todayHours || todayHours.closed) && (
-                        <div style={{ fontWeight: "400", color: "#dc2626", marginTop: "3px" }}>
-                          We are closed today
-                        </div>
-                      )}
                     </div>
                   )}
                 </div>
