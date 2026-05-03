@@ -45,14 +45,13 @@ function MenuPage() {
     fetch("http://localhost:8080/trains/arrivals?stationName=Cramlington")
       .then(res => res.json())
       .then(data => {
-        const trainList = Array.isArray(data) ? data : [];
-        setTrains(trainList);
+        setTrains(data);
         setTrainsLoading(false);
-        if (trainList.length > 0) {
+        if (data.length > 0) {
           setSelectedTrain(prev => {
-            if (!prev) return trainList[0];
-            const refreshed = trainList.find(t => t.trainId === prev.trainId);
-            return refreshed || trainList[0];
+            if (!prev) return data[0];
+            const refreshed = data.find(t => t.trainId === prev.trainId);
+            return refreshed || data[0];
           });
         }
       })
@@ -85,7 +84,7 @@ function MenuPage() {
     currentTime >= todayHours.openTime &&
     currentTime <= todayHours.closeTime;
 
-  // ✅ NEW: หาวันถัดไปที่เปิด
+// ✅ NEW: หาวันถัดไปที่เปิด
   const getNextOpenDay = () => {
     const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
     let i = new Date().getDay();
@@ -112,28 +111,21 @@ function MenuPage() {
 
   // ✅ UPDATED: time slots — ถ้าวันนี้ปิด ใช้วันถัดไปที่เปิด
   const timeSlots = useMemo(() => {
-    const next = getNextOpenDay();
-    const target = (!todayHours || todayHours.closed) ? next?.hours : todayHours;
-    if (!target || !target.openTime) return [];
+    if (!todayHours || todayHours.closed || !todayHours.openTime) return [];
     const slots = [];
-    let [hour, minute] = target.openTime.split(":").map(Number);
-    const [closeHour, closeMinute] = target.closeTime.split(":").map(Number);
+    let [hour, minute] = todayHours.openTime.split(":").map(Number);
+    const [closeHour, closeMinute] = todayHours.closeTime.split(":").map(Number);
     while (hour < closeHour || (hour === closeHour && minute <= closeMinute)) {
       const time = `${String(hour).padStart(2,"0")}:${String(minute).padStart(2,"0")}`;
-      // ถ้าวันนี้เปิดและร้านเปิดอยู่ ให้กรองเวลาที่ผ่านไปแล้วออก
-      if (todayHours && !todayHours.closed && isOpenNow) {
-        if (time >= currentTime) slots.push(time);
-      } else {
-        slots.push(time);
-      }
+      if (!isOpenNow || time >= currentTime) slots.push(time);
       minute += 5;
       if (minute >= 60) { minute = 0; hour++; }
     }
     return slots;
-  }, [todayHours, hours, currentTime, isOpenNow]);
+  }, [todayHours, currentTime, isOpenNow]);
 
   useEffect(() => {
-    if (timeSlots.length > 0) setPickupTime(timeSlots[0]);
+    if (timeSlots.length > 0) setPickupTime(prev => prev || timeSlots[0]);
   }, [timeSlots]);
 
   const formatTime = (time) => {
@@ -196,14 +188,14 @@ function MenuPage() {
       alert("This train is cancelled. Please select another."); return;
     }
 
-    // ✅ UPDATED: ส่ง pickupTime พร้อมวันที่ด้วย เช่น "2026-05-04 06:30"
+   // ✅ UPDATED: ส่ง pickupTime พร้อมวันที่ด้วย เช่น "2026-05-04 06:30"
     const pickupDateTime = `${getPickupDate()} ${pickupTime}`;
 
     const order = {
       customer: { id: user.id },
-      pickupTime: pickupType === "train" ? selectedTrain.estimatedArrivalTime : pickupDateTime,
+      pickupTime: pickupType === "train" ? selectedTrain.estimatedArrivalTime : pickupTime,
       trainId: pickupType === "train" ? selectedTrain.trainId : null,
-      estimatedArrivalTime: pickupType === "train" ? selectedTrain.estimatedArrivalTime : pickupDateTime,
+      estimatedArrivalTime: pickupType === "train" ? selectedTrain.estimatedArrivalTime : pickupTime,
       items: cart.map(i => ({ menuItemId: i.id, size: i.size, quantity: i.quantity }))
     };
 
@@ -230,59 +222,54 @@ function MenuPage() {
   };
 
   return (
-    <div style={{ background: "#f5f1eb", minHeight: "100vh", padding: "24px 24px 40px", fontFamily: "'Segoe UI', sans-serif" }}>
-
+    <div className="bg-[#f5f1eb] min-h-screen p-4 sm:p-6 pb-24 font-sans">
       {/* HEADER */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", maxWidth: "1200px", margin: "0 auto 28px" }}>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center max-w-[1200px] mx-auto mb-7 gap-4">
         <div>
-          <h1 style={{ margin: 0, fontSize: "26px", fontWeight: "700" }}>
+          <h1 className="m-0 text-2xl sm:text-[26px] font-bold">
             ☕ {station?.kioskName || "Whistlestop Coffee"}
           </h1>
           {todayHours && (
-            <p style={{ margin: "4px 0 0", fontSize: "13px", color: isOpenNow ? "#16a34a" : "#ea580c" }}>
-              {todayHours.closed
-                ? `Closed today — ${preOrderLabel() || "pre-orders available"}`
-                : isOpenNow
-                  ? `Open · ${todayHours.openTime}–${todayHours.closeTime}`
-                  : `Closed · Pre-order for ${todayHours.openTime}`}
-            </p>
+            <p className={`m-0 mt-1 text-[13px] ${isOpenNow ? "text-green-600" : "text-orange-600"}`}>
+              {todayHours.closed ? "Closed today — pre-orders available"
+                : isOpenNow ? `Open · ${todayHours.openTime}–${todayHours.closeTime}`
+                : `Closed · Pre-order for ${todayHours.openTime}`}
+            </p >
           )}
         </div>
-        <button
-          onClick={() => { localStorage.removeItem("user"); navigate("/"); }}
-          style={{ background: "#ef4444", color: "#fff", padding: "8px 14px", borderRadius: "8px", border: "none", cursor: "pointer", fontSize: "13px" }}
-        >Logout</button>
       </div>
 
-      {/* BODY */}
-      <div style={{ display: "flex", gap: "24px", maxWidth: "1200px", margin: "0 auto" }}>
+      {/* BODY: On mobile it's column, on large screens (lg) it's row */}
+      <div className="flex flex-col lg:flex-row gap-6 max-w-[1200px] mx-auto relative">
 
-        {/* MENU GRID */}
-        <div style={{ flex: 1, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))", gap: "16px", alignContent: "start" }}>
+        {/* MENU GRID: 2 columns on mobile, 3 on tablet, 4 on large screens */}
+        <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 content-start">
           {menu.map(item => {
             const size = selectedSizes[item.id] || "Regular";
             const price = size === "Large" ? item.priceLarge : item.priceRegular;
             return (
-              <div key={item.id} style={{ background: "#fff", borderRadius: "14px", overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.07)" }}>
-                <img src={imageMap[item.name] || "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=500"}
-                  alt={item.name} style={{ width: "100%", height: "130px", objectFit: "cover" }} />
-                <div style={{ padding: "12px" }}>
-                  <div style={{ fontWeight: "600", marginBottom: "6px", fontSize: "14px" }}>{item.name}</div>
+              <div key={item.id} className="bg-white rounded-2xl overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.07)] flex flex-col">
+                < img src={imageMap[item.name] || "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=500"}
+                  alt={item.name} className="w-full h-28 sm:h-32 object-cover" />
+                <div className="p-3 flex flex-col flex-1">
+                  <div className="font-semibold mb-2 text-[13px] sm:text-[14px] leading-tight flex-1">{item.name}</div>
+
                   {item.hasSize && (
-                    <div style={{ display: "flex", gap: "5px", marginBottom: "8px" }}>
+                    <div className="flex gap-1 mb-2">
                       {["Regular", "Large"].map(s => (
                         <button key={s} onClick={() => setSelectedSizes(p => ({ ...p, [item.id]: s }))}
-                          style={{ flex: 1, padding: "3px 0", border: "none", borderRadius: "5px", cursor: "pointer", fontSize: "11px",
-                            background: size === s ? "#6f4e37" : "#e5e7eb", color: size === s ? "#fff" : "#374151" }}>
+                          style={{ background: size === s ? "#6f4e37" : "#e5e7eb", color: size === s ? "#fff" : "#374151" }}
+                          className="flex-1 py-1 border-none rounded-[5px] cursor-pointer text-[11px] transition-colors">
                           {s}
                         </button>
                       ))}
                     </div>
                   )}
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontWeight: "700", fontSize: "14px" }}>£{price.toFixed(2)}</span>
+
+                  <div className="flex justify-between items-center mt-auto pt-1">
+                    <span className="font-bold text-[13px] sm:text-[14px]">£{price.toFixed(2)}</span>
                     <button onClick={() => addToCart(item)}
-                      style={{ background: "#6f4e37", color: "#fff", border: "none", borderRadius: "7px", padding: "5px 12px", cursor: "pointer", fontSize: "13px" }}>
+                      className="bg-[#6f4e37] text-white border-none rounded-lg px-2 sm:px-3 py-1 cursor-pointer text-[12px] sm:text-[13px] hover:bg-[#5a3f2d] transition-colors">
                       + Add
                     </button>
                   </div>
@@ -293,35 +280,34 @@ function MenuPage() {
         </div>
 
         {/* CART PANEL */}
-        <div style={{ width: "310px", flexShrink: 0, background: "#fff", borderRadius: "16px", padding: "20px", boxShadow: "0 4px 16px rgba(0,0,0,0.09)", height: "fit-content" }}>
-          <h2 style={{ margin: "0 0 14px", fontSize: "17px" }}>🛒 Your Order</h2>
+        <div className="w-full lg:w-[310px] shrink-0 bg-white rounded-2xl p-5 shadow-[0_4px_16px_rgba(0,0,0,0.09)] h-fit lg:sticky lg:top-6">
+          <h2 className="m-0 mb-4 text-[17px]">🛒 Your Order</h2>
 
           {cart.length === 0
-            ? <p style={{ color: "#9ca3af", fontSize: "13px" }}>Add items to get started</p>
+            ? <p className="text-gray-400 text-[13px]">Add items to get started</p >
             : cart.map((item, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px", fontSize: "13px" }}>
-                <span style={{ flex: 1 }}>{item.name} <span style={{ color: "#9ca3af" }}>({item.size})</span></span>
-                <button onClick={() => updateQty(i, -1)} style={{ width: "22px", height: "22px", borderRadius: "50%", border: "none", background: "#f3f4f6", cursor: "pointer" }}>−</button>
-                <span style={{ width: "16px", textAlign: "center" }}>{item.quantity}</span>
-                <button onClick={() => updateQty(i, +1)} style={{ width: "22px", height: "22px", borderRadius: "50%", border: "none", background: "#f3f4f6", cursor: "pointer" }}>+</button>
-                <span style={{ width: "40px", textAlign: "right", fontWeight: "500" }}>£{(item.selectedPrice * item.quantity).toFixed(2)}</span>
+              <div key={i} className="flex items-center gap-2 mb-3 text-[13px]">
+                <span className="flex-1 leading-tight">{item.name} <span className="text-gray-400 text-[11px]">({item.size})</span></span>
+                <button onClick={() => updateQty(i, -1)} className="w-6 h-6 rounded-full border-none bg-gray-100 hover:bg-gray-200 cursor-pointer flex items-center justify-center">−</button>
+                <span className="w-4 text-center">{item.quantity}</span>
+                <button onClick={() => updateQty(i, +1)} className="w-6 h-6 rounded-full border-none bg-gray-100 hover:bg-gray-200 cursor-pointer flex items-center justify-center">+</button>
+                <span className="w-10 text-right font-medium">£{(item.selectedPrice * item.quantity).toFixed(2)}</span>
               </div>
             ))
           }
 
           {cart.length > 0 && (
-            <div style={{ borderTop: "1px solid #f3f4f6", paddingTop: "10px", fontWeight: "700", marginBottom: "16px" }}>
+            <div className="border-t border-gray-100 pt-3 font-bold mb-4 mt-2">
               Total: £{cartTotal.toFixed(2)}
             </div>
           )}
 
           {/* PICKUP TOGGLE */}
-          <div style={{ display: "flex", gap: "6px", marginBottom: "12px" }}>
+          <div className="flex gap-2 mb-3">
             {[["time", "⏰ Pick Time"], ["train", "🚆 My Train"]].map(([type, label]) => (
               <button key={type} onClick={() => setPickupType(type)}
-                style={{ flex: 1, padding: "7px", borderRadius: "8px", border: "none", cursor: "pointer", fontSize: "12px", fontWeight: "600",
-                  background: pickupType === type ? "#6f4e37" : "#f3f4f6",
-                  color: pickupType === type ? "#fff" : "#374151" }}>
+                style={{ background: pickupType === type ? "#6f4e37" : "#f3f4f6", color: pickupType === type ? "#fff" : "#374151" }}
+                className="flex-1 p-2 rounded-lg border-none cursor-pointer text-[12px] font-semibold transition-colors">
                 {label}
               </button>
             ))}
@@ -330,34 +316,32 @@ function MenuPage() {
           {/* TIME PICKER */}
           {pickupType === "time" && (
             <div>
-              {/* ✅ NEW: แสดง label ถ้าเป็น pre-order */}
+              {/* ✅ NEW: แสดงแสดง label ถ้าเป็น pre-order */}
               {preOrderLabel() && (
                 <p style={{ fontSize: "11px", color: "#ea580c", marginBottom: "6px" }}>
                   📅 {preOrderLabel()}
                 </p>
               )}
-              <select value={pickupTime} onChange={e => setPickupTime(e.target.value)}
-                style={{ width: "100%", padding: "8px", borderRadius: "8px", border: "1px solid #d1d5db", marginBottom: "4px", fontSize: "13px" }}>
-                {timeSlots.map(t => <option key={t} value={t}>{formatTime(t)}</option>)}
-              </select>
+             <select value={pickupTime} onChange={e => setPickupTime(e.target.value)}
+               className="w-full p-2 rounded-lg border border-gray-300 mb-1 text-[13px] bg-white">
+               {timeSlots.map(t => <option key={t} value={t}>{formatTime(t)}</option>)}
+             </select>
             </div>
           )}
 
           {/* TRAIN CARD PICKER */}
           {pickupType === "train" && (
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
-                <span style={{ fontSize: "12px", color: "#6b7280" }}>Trains to Cramlington</span>
-                {trainsLoading && <span style={{ fontSize: "11px", color: "#9ca3af" }}>↻</span>}
+              <div className="flex justify-between mb-2">
+                <span className="text-[12px] text-gray-500">Trains to Cramlington</span>
+                {trainsLoading && <span className="text-[11px] text-gray-400">↻</span>}
               </div>
 
               {trains.length === 0 && !trainsLoading && (
-                <p style={{ fontSize: "12px", color: "#9ca3af", textAlign: "center", padding: "12px 0" }}>
-                  No upcoming arrivals found
-                </p>
+                <p className="text-[12px] text-gray-400 text-center py-3">No upcoming arrivals found</p >
               )}
 
-              <div style={{ maxHeight: "300px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "6px" }}>
+              <div className="max-h-[300px] overflow-y-auto flex flex-col gap-2 pr-1">
                 {trains.map(train => {
                   const badge = getStatusBadge(train);
                   const delay = getDelayMinutes(train);
@@ -369,31 +353,27 @@ function MenuPage() {
                       onClick={() => !isCancelled && setSelectedTrain(train)}
                       style={{
                         border: `${isSelected ? "2px" : "1px"} solid ${isSelected ? "#6f4e37" : "#e5e7eb"}`,
-                        borderRadius: "9px", padding: "9px 11px",
-                        cursor: isCancelled ? "not-allowed" : "pointer",
                         background: isSelected ? "#fdf8f5" : isCancelled ? "#fef2f2" : "#fff",
-                        opacity: isCancelled ? 0.65 : 1,
-                        transition: "border-color 0.1s, background 0.1s"
-                      }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "6px" }}>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: "12px", fontWeight: "600", color: "#111827" }}>
+                        opacity: isCancelled ? 0.65 : 1
+                      }}
+                      className={`rounded-lg p-2 cursor-${isCancelled ? "not-allowed" : "pointer"} transition-all`}>
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="flex-1">
+                          <div className="text-[12px] font-semibold text-gray-900 leading-tight">
                             {train.origin} → Cramlington
                           </div>
-                          <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "2px" }}>
+                          <div className="text-[11px] text-gray-500 mt-1">
                             Sched <strong>{train.scheduledArrivalTime}</strong>
                             {delay !== 0 && (
-                              <span style={{ color: delay > 0 ? "#ea580c" : "#16a34a", marginLeft: "5px" }}>
+                              <span className={`ml-1 ${delay > 0 ? "text-orange-600" : "text-green-600"}`}>
                                 · Est <strong>{train.estimatedArrivalTime}</strong>
                               </span>
                             )}
                           </div>
                         </div>
-                        <span style={{
-                          background: badge.bg, color: "#fff",
-                          fontSize: "10px", fontWeight: "700",
-                          padding: "2px 7px", borderRadius: "20px", whiteSpace: "nowrap"
-                        }}>{badge.label}</span>
+                        <span style={{ background: badge.bg }} className="text-white text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap">
+                          {badge.label}
+                        </span>
                       </div>
                     </div>
                   );
@@ -401,13 +381,13 @@ function MenuPage() {
               </div>
 
               {selectedTrain && (
-                <div style={{ marginTop: "10px", background: "#fdf8f5", borderRadius: "8px", padding: "10px", fontSize: "12px" }}>
-                  <div style={{ color: "#6b7280" }}>☕ Coffee ready before</div>
-                  <div style={{ fontSize: "22px", fontWeight: "800", color: "#6f4e37" }}>
+                <div className="mt-3 bg-[#fdf8f5] rounded-lg p-3 text-[12px]">
+                  <div className="text-gray-500 mb-1">☕ Coffee ready before</div>
+                  <div className="text-[22px] font-extrabold text-[#6f4e37] leading-none">
                     {selectedTrain.estimatedArrivalTime}
                   </div>
                   {getDelayMinutes(selectedTrain) > 0 && (
-                    <div style={{ color: "#ea580c", marginTop: "2px" }}>
+                    <div className="text-orange-600 mt-1 font-medium">
                       ⚠️ Delayed +{getDelayMinutes(selectedTrain)} min · we'll adjust your order
                     </div>
                   )}
@@ -419,13 +399,8 @@ function MenuPage() {
           <button
             onClick={placeOrder}
             disabled={cart.length === 0}
-            style={{
-              width: "100%", marginTop: "14px", padding: "12px",
-              borderRadius: "10px", border: "none",
-              background: cart.length === 0 ? "#d1d5db" : "#22c55e",
-              color: "#fff", fontWeight: "700", fontSize: "14px",
-              cursor: cart.length === 0 ? "not-allowed" : "pointer"
-            }}>
+            className={`w-full mt-4 p-3 rounded-xl border-none font-bold text-[14px] transition-colors
+              ${cart.length === 0 ? "bg-gray-300 text-gray-100 cursor-not-allowed" : "bg-green-500 text-white cursor-pointer hover:bg-green-600"}`}>
             Checkout · £{cartTotal.toFixed(2)}
           </button>
         </div>

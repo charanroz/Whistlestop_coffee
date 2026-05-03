@@ -23,27 +23,25 @@ function Layout() {
   return (
     <>
       {!hideNavbar && (
-        <nav style={{
-          padding: "15px",
-          background: "#f5f5f5",
-          marginBottom: "20px"
-        }}>
+        <nav className="flex flex-wrap items-center justify-between p-4 bg-[#f5f5f5] mb-5 gap-y-3">
 
+         <div className="flex flex-wrap gap-4">
           {/* CUSTOMER NAV */}
           {user?.role === "CUSTOMER" && (
-            <>
-              <Link to="/menu" style={{ marginRight: "15px" }}>Menu</Link>
-              <Link to="/my-orders" style={{ marginRight: "15px" }}>My Orders</Link>
-            </>
+           <>
+            <Link to="/menu" className="font-medium text-gray-700 hover:text-[#6f4e37] no-underline">Menu</Link>
+            <Link to="/my-orders" className="font-medium text-gray-700 hover:text-[#6f4e37] no-underline">My Orders</Link>
+           </>
           )}
 
           {/* STAFF NAV */}
           {user?.role === "STAFF" && (
             <>
-              <Link to="/orders" style={{ marginRight: "15px" }}>Dashboard</Link>
-              <Link to="/cancel" style={{ marginRight: "15px" }}>Cancel Order</Link>
+              <Link to="/orders" className="font-medium text-gray-700 hover:text-[#6f4e37] no-underline">Dashboard</Link>
+              <Link to="/cancel" className="font-medium text-gray-700 hover:text-[#6f4e37] no-underline">Cancel Order</Link>
             </>
           )}
+          </div>
 
           {/* LOGOUT */}
           {user && (
@@ -52,7 +50,7 @@ function Layout() {
                 localStorage.removeItem("user");
                 window.location.href = "/login";
               }}
-              style={{ marginLeft: "20px" }}
+              className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-medium border-none cursor-pointer hover:bg-red-600 transition"
             >
               Logout
             </button>
