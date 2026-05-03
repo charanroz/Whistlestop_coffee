@@ -45,13 +45,14 @@ function MenuPage() {
     fetch("http://localhost:8080/trains/arrivals?stationName=Cramlington")
       .then(res => res.json())
       .then(data => {
-        setTrains(data);
+        const trainList = Array.isArray(data) ? data : [];
+        setTrains(trainList);
         setTrainsLoading(false);
-        if (data.length > 0) {
+        if (trainList.length > 0) {
           setSelectedTrain(prev => {
-            if (!prev) return data[0];
-            const refreshed = data.find(t => t.trainId === prev.trainId);
-            return refreshed || data[0];
+            if (!prev) return trainList[0];
+            const refreshed = trainList.find(t => t.trainId === prev.trainId);
+            return refreshed || trainList[0];
           });
         }
       })

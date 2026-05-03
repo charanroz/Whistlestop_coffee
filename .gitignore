@@ -12,3 +12,9 @@ build/
 # IDE
 .idea/
 .vscode/
+
+# Sensitive config — each developer uses their own copy
+backend/src/main/resources/application.properties
+
+# H2 database files
+data/

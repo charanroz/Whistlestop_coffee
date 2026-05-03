@@ -1,0 +1,51 @@
+# ════════════════════════════════════════════════════════════════════
+#  HOW TO USE:
+#  Copy this file and rename it to: application.properties
+#  (in the same folder as this file)
+#
+#  To run WITHOUT Kafka (recommended for local dev):
+#    Set spring.autoconfigure.exclude below (already done in the
+#    "LOCAL DEV" block). You will get mock train data automatically.
+#
+#  To run WITH live Network Rail data:
+#    Fill in your own RDM credentials and remove the exclude line.
+# ════════════════════════════════════════════════════════════════════
+
+# ── Database (H2 file-based, no setup required) ──────────────────────
+spring.datasource.url=jdbc:h2:file:./data/whistlestop
+spring.datasource.driver-class-name=org.h2.Driver
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+
+spring.h2.console.enabled=true
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+spring.sql.init.mode=never
+spring.jpa.defer-datasource-initialization=true
+
+# ── LOCAL DEV: Disable Kafka so you don't need NWR credentials ───────
+# Remove or comment out this line only if you have real NWR credentials
+spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+
+# ── Kafka (Confluent Cloud) — only needed for live train data ─────────
+# Leave these blank if you disabled Kafka above (mock data will be used)
+spring.kafka.bootstrap-servers=
+spring.kafka.consumer.group-id=
+spring.kafka.consumer.auto-offset-reset=latest
+spring.kafka.consumer.key-deserializer=org.apache.kafka.common.serialization.StringDeserializer
+spring.kafka.consumer.value-deserializer=org.apache.kafka.common.serialization.StringDeserializer
+spring.kafka.properties.security.protocol=SASL_SSL
+spring.kafka.properties.sasl.mechanism=PLAIN
+spring.kafka.properties.sasl.jaas.config=
+
+# ── Cramlington Station Codes ─────────────────────────────────────────
+networkrail.cramlington.stanox=12136
+networkrail.cramlington.tiploc=CRMLNGT
+networkrail.cramlington.crs=CRM
+
+# ── RDM Schedule (optional, only for live schedule data) ─────────────
+rdm.username=
+rdm.password=
+rdm.schedule.dsCode=
+rdm.schedule.dataProductCode=
