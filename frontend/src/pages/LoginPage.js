@@ -12,8 +12,8 @@ function LoginPage() {
     try {
       const url =
         role === "STAFF"
-          ? "http://localhost:8080/api/staff/login"
-          : "http://localhost:8080/api/customer/login";
+          ? "http://18.130.223.148:8080/api/staff/login"
+          : "http://18.130.223.148:8080/api/customer/login";
 
       const res = await fetch(url, {
         method: "POST",

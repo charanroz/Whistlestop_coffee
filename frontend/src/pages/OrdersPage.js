@@ -5,7 +5,7 @@ function OrdersPage() {
 
   useEffect(() => {
     const fetchOrders = () => {
-      fetch("http://localhost:8080/orders")
+      fetch("http://18.130.223.148:8080/orders")
         .then(res => res.json())
         .then(data => setOrders(data))
         .catch(err => console.error(err));
@@ -29,13 +29,13 @@ function OrdersPage() {
   };
 
   const updateStatus = async (orderId, status) => {
-    await fetch(`http://localhost:8080/orders/${orderId}/status?status=${status}`, {
+    await fetch(`http://18.130.223.148:8080/orders/${orderId}/status?status=${status}`, {
       method: "PUT"
     });
   };
 
   const cancelOrder = async (orderId) => {
-    await fetch(`http://localhost:8080/orders/${orderId}/staff-cancel?reason=OUT_OF_STOCK`, {
+    await fetch(`http://18.130.223.148:8080/orders/${orderId}/staff-cancel?reason=OUT_OF_STOCK`, {
       method: "PUT"
     });
   };

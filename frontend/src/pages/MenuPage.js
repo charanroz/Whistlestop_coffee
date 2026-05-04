@@ -24,17 +24,17 @@ function MenuPage() {
 
   // fetch menu, station, hours once
   useEffect(() => {
-    fetch("http://localhost:8080/menu")
+    fetch("http://18.130.223.148:8080/menu")
       .then(res => res.json())
       .then(setMenu)
       .catch(() => {});
 
-    fetch("http://localhost:8080/station-setting")
+    fetch("http://18.130.223.148:8080/station-setting")
       .then(res => res.json())
       .then(setStation)
       .catch(() => {});
 
-    fetch("http://localhost:8080/business-hours")
+    fetch("http://18.130.223.148:8080/business-hours")
       .then(res => res.json())
       .then(setHours)
       .catch(() => {});
@@ -43,7 +43,7 @@ function MenuPage() {
   // fetch trains initially and every 60 seconds
   const fetchTrains = () => {
     setTrainsLoading(true);
-    fetch("http://localhost:8080/trains/arrivals?stationName=Cramlington")
+    fetch("http://18.130.223.148:8080/trains/arrivals?stationName=Cramlington")
       .then(res => res.json())
       .then(data => {
         const trainList = Array.isArray(data) ? data : [];
@@ -216,7 +216,7 @@ function MenuPage() {
     };
 
     try {
-      const res = await fetch("http://localhost:8080/orders", {
+      const res = await fetch("http://18.130.223.148:8080/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(order)

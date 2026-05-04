@@ -58,7 +58,7 @@ The default config already has Kafka **disabled**, so the app runs immediately w
 3. Wait for Maven to download dependencies (progress bar at bottom-right)
 4. Open `src/main/java/.../WhistlestopCoffeeApplication.java`
 5. Click the green ▶ **Run** button
-6. Backend starts on **http://localhost:8080**
+6. Backend starts on **http://18.130.223.148:8080**
 
 On first startup you will see in the console:
 ```

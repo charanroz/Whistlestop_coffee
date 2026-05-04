@@ -10,7 +10,7 @@ function SignupPage() {
 
   const handleSignup = async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/customer/signup", {
+      const res = await fetch("http://18.130.223.148:8080/api/customer/signup", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ name, email, password })

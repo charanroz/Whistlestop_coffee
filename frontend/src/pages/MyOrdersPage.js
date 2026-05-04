@@ -12,7 +12,7 @@ function MyOrdersPage() {
     if (!user) return;
 
     const fetchOrders = () => {
-      fetch(`http://localhost:8080/orders/customer/${user.id}`)
+      fetch(`http://18.130.223.148:8080/orders/customer/${user.id}`)
         .then(res => res.json())
         .then(data => setOrders(data))
         .catch(err => console.error(err));

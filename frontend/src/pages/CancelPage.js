@@ -15,7 +15,7 @@ function CancelPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/orders/${orderId}/cancel?reason=${reason}`,
+        `http://18.130.223.148:8080/orders/${orderId}/cancel?reason=${reason}`,
         {
           method: "PUT"
         }

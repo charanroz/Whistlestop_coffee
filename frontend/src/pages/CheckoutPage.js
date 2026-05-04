@@ -14,7 +14,7 @@ function CheckoutPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/payments/process?orderId=${orderId}`,
+        `http://18.130.223.148:8080/payments/process?orderId=${orderId}`,
         { method: "POST" }
       );
 
