@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 function MenuPage() {
@@ -20,7 +20,7 @@ function MenuPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!user) navigate("/");
-  }, []);
+  }, [user, navigate]);
 
   // fetch menu, station, hours once
   useEffect(() => {
@@ -87,16 +87,16 @@ function MenuPage() {
     currentTime <= todayHours.closeTime;
 
   // หาวันถัดไปที่เปิด
-  const getNextOpenDay = () => {
-    const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-    let i = new Date().getDay();
-    for (let x = 1; x <= 7; x++) {
-      const next = days[(i + x) % 7];
-      const found = hours.find(h => h.dayOfWeek === next && !h.closed);
-      if (found) return { hours: found, daysAhead: x };
-    }
-    return null;
-  };
+    const getNextOpenDay = useCallback(() => {
+      const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+      let i = new Date().getDay();
+      for (let x = 1; x <= 7; x++) {
+        const next = days[(i + x) % 7];
+        const found = hours.find(h => h.dayOfWeek === next && !h.closed);
+        if (found) return { hours: found, daysAhead: x };
+      }
+      return null;
+    }, [hours]);
 
   // หาวันที่ของ pickup (วันนี้หรือวันถัดไปที่เปิด)
   const getPickupDate = () => {
@@ -116,22 +116,33 @@ function MenuPage() {
   const timeSlots = useMemo(() => {
     const next = getNextOpenDay();
     const target = (!todayHours || todayHours.closed) ? next?.hours : todayHours;
+
     if (!target || !target.openTime) return [];
+
     const slots = [];
     let [hour, minute] = target.openTime.split(":").map(Number);
     const [closeHour, closeMinute] = target.closeTime.split(":").map(Number);
+
     while (hour < closeHour || (hour === closeHour && minute <= closeMinute)) {
       const time = `${String(hour).padStart(2,"0")}:${String(minute).padStart(2,"0")}`;
+
       if (todayHours && !todayHours.closed && isOpenNow) {
-        if (time >= currentTime) slots.push(time);
+        if (time >= currentTime) {
+          slots.push(time);
+        }
       } else {
         slots.push(time);
       }
+
       minute += 5;
-      if (minute >= 60) { minute = 0; hour++; }
+      if (minute >= 60) {
+        minute = 0;
+        hour++;
+      }
     }
+
     return slots;
-  }, [todayHours, hours, currentTime, isOpenNow]);
+  }, [todayHours, hours, currentTime, isOpenNow, getNextOpenDay]);
 
   useEffect(() => {
     if (timeSlots.length > 0) setPickupTime(timeSlots[0]);
