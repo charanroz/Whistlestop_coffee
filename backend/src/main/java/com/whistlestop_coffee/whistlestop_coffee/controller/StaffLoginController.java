@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/staff")
-@CrossOrigin
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class StaffLoginController {
 
     @Autowired

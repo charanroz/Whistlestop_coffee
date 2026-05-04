@@ -8,6 +8,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/business-hours")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class BusinessHourController {
 
     private final BusinessHourManager businessHourManager;

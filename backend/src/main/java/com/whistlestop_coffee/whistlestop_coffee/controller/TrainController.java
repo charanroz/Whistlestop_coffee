@@ -8,7 +8,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/trains")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class TrainController {
 
     private final TrainService trainService;

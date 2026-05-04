@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/menu")
-@CrossOrigin
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class MenuController {
     @Autowired
     private MenuManager menuManager;

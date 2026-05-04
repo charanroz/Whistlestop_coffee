@@ -7,6 +7,7 @@ import com.whistlestop_coffee.whistlestop_coffee.dto.LoginResult;
 
 @RestController
 @RequestMapping("/station-setting")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class StationSettingController {
 
     private final StationSettingManager stationSettingManager;
