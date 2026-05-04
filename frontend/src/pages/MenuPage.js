@@ -142,7 +142,7 @@ function MenuPage() {
     }
 
     return slots;
-  }, [todayHours, hours, currentTime, isOpenNow, getNextOpenDay]);
+  }, [todayHours, currentTime, isOpenNow, getNextOpenDay]);
 
   useEffect(() => {
     if (timeSlots.length > 0) setPickupTime(timeSlots[0]);
