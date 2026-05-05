@@ -1,21 +1,38 @@
 import { useEffect, useState } from "react";
+
 const API = "https://whistlestop-coffee.onrender.com";
 
 function OrdersPage() {
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [lastUpdateTime, setLastUpdateTime] = useState(0);
 
   useEffect(() => {
     const fetchOrders = () => {
+      if (Date.now() - lastUpdateTime < 2000) return;
+
       fetch(`${API}/orders`)
         .then(res => res.json())
-        .then(data => setOrders(data))
-        .catch(err => console.error(err));
+        .then(data => {
+          setOrders(data);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error(err);
+          setLoading(false);
+        });
     };
 
     fetchOrders();
+
     const interval = setInterval(fetchOrders, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [lastUpdateTime]);
+
+  //hide archived orders
+  const visibleOrders = orders.filter(
+    o => o.status !== "Collected" && o.status !== "Cancelled"
+  );
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -39,8 +56,11 @@ function OrdersPage() {
         o.id === orderId ? { ...o, status } : o
       )
     );
+
+    setLastUpdateTime(Date.now());
   };
 
+  // cancel + archive
   const cancelOrder = async (orderId) => {
     await fetch(`${API}/orders/${orderId}/staff-cancel?reason=OUT_OF_STOCK`, {
       method: "PUT"
@@ -51,6 +71,8 @@ function OrdersPage() {
         o.id === orderId ? { ...o, status: "Cancelled" } : o
       )
     );
+
+    setLastUpdateTime(Date.now());
   };
 
   const buttonStyle = {
@@ -69,9 +91,11 @@ function OrdersPage() {
     }}>
       <h1 style={{ textAlign: "center" }}>☕ Staff Dashboard</h1>
 
-      {orders.length === 0 && (
-        <p style={{ textAlign: "center" }}>No orders yet</p>
-      )}
+      {loading ? (
+        <p style={{ textAlign: "center" }}>Loading orders...</p>
+      ) : visibleOrders.length === 0 ? (
+        <p style={{ textAlign: "center" }}>No active orders</p>
+      ) : null}
 
       <div style={{
         display: "grid",
@@ -79,7 +103,7 @@ function OrdersPage() {
         gap: "20px"
       }}>
 
-        {orders.map(order => (
+        {visibleOrders.map(order => (
           <div key={order.id} style={{
             background: "white",
             borderRadius: "20px",
@@ -105,6 +129,7 @@ function OrdersPage() {
             </span>
 
             <p><strong>Pickup:</strong> {order.pickupTime}</p>
+
             {order.trainId && (
               <p style={{ color: "#e65100", fontWeight: "bold" }}>
                 🚆 Train: {order.trainId}
@@ -117,13 +142,17 @@ function OrdersPage() {
               {order.items?.map((item, i) => (
                 <li key={i}>
                   {item.menuItem?.name} ({item.size}) x{item.quantity}
-                  {/* ✅ แก้จาก item.price เป็น item.unitPrice */}
                   - £{item.unitPrice?.toFixed(2)}
                 </li>
               ))}
             </ul>
 
-            <div style={{ marginTop: "10px", display: "flex", flexWrap: "wrap", gap: "5px" }}>
+            <div style={{
+              marginTop: "10px",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "5px"
+            }}>
 
               <button
                 style={buttonStyle}
@@ -149,7 +178,6 @@ function OrdersPage() {
                 Ready
               </button>
 
-              {/* ✅ แก้จาก order.totalPrice เป็น order.total */}
               <p><strong>Total: £{order.total?.toFixed(2)}</strong></p>
 
               <button
@@ -173,7 +201,6 @@ function OrdersPage() {
               </button>
 
             </div>
-
           </div>
         ))}
       </div>
