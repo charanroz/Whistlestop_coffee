@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
+const API = "https://whistlestop-coffee.onrender.com";
 
 function OrdersPage() {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
     const fetchOrders = () => {
-      fetch("http://18.130.223.148:8080/orders")
+      fetch(`${API}/orders`)
         .then(res => res.json())
         .then(data => setOrders(data))
         .catch(err => console.error(err));
@@ -29,15 +30,15 @@ function OrdersPage() {
   };
 
   const updateStatus = async (orderId, status) => {
-    await fetch(`http://18.130.223.148:8080/orders/${orderId}/status?status=${status}`, {
+    await fetch(`${API}/orders/${orderId}/status?status=${status}`), {
       method: "PUT"
-    });
+    };
   };
 
   const cancelOrder = async (orderId) => {
-    await fetch(`http://18.130.223.148:8080/orders/${orderId}/staff-cancel?reason=OUT_OF_STOCK`, {
+    await fetch(`${API}/orders/${orderId}/staff-cancel?reason=OUT_OF_STOCK`), {
       method: "PUT"
-    });
+    };
   };
 
   const buttonStyle = {

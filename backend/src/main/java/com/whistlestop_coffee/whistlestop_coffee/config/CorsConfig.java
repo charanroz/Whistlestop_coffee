@@ -14,9 +14,9 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins(
+                        .allowedOriginPatterns(
                                 "http://localhost:3000",
-                                "https://whistlestop-coffee-je2g.vercel.app"
+                                "https://*.vercel.app"
                         )
                         .allowedMethods("*");
             }

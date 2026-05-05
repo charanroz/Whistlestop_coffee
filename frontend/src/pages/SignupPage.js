@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+const API = "https://whistlestop-coffee.onrender.com";
 
 function SignupPage() {
   const [name, setName] = useState("");
@@ -10,7 +11,7 @@ function SignupPage() {
 
   const handleSignup = async () => {
     try {
-      const res = await fetch("http://18.130.223.148:8080/api/customer/signup", {
+      const res = await fetch(`${API}/api/customer/signup`,{
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ name, email, password })

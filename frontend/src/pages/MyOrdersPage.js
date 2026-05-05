@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+const API = "https://whistlestop-coffee.onrender.com";
 
 function MyOrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -12,7 +13,7 @@ function MyOrdersPage() {
     if (!user) return;
 
     const fetchOrders = () => {
-      fetch(`http://18.130.223.148:8080/orders/customer/${user.id}`)
+      fetch(`${API}/orders/customer/${user.id}`)
         .then(res => res.json())
         .then(data => setOrders(data))
         .catch(err => console.error(err));

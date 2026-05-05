@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+const API = "https://whistlestop-coffee.onrender.com";
 
 function CheckoutPage() {
   const { orderId } = useParams();
@@ -14,8 +15,8 @@ function CheckoutPage() {
 
     try {
       const response = await fetch(
-        `http://18.130.223.148:8080/payments/process?orderId=${orderId}`,
-        { method: "POST" }
+        `${API}/payments/process?orderId=${orderId}`,
+         { method: "POST" }
       );
 
       if (response.ok) {

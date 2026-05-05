@@ -10,10 +10,12 @@ function LoginPage() {
 
   const handleLogin = async () => {
     try {
+      const API = "https://whistlestop-coffee.onrender.com";
+
       const url =
         role === "STAFF"
-          ? "http://18.130.223.148:8080/api/staff/login"
-          : "http://18.130.223.148:8080/api/customer/login";
+          ? `${API}/api/staff/login`
+          : `${API}/api/customer/login`;
 
       const res = await fetch(url, {
         method: "POST",

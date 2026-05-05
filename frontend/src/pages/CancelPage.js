@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+const API = "https://whistlestop-coffee.onrender.com";
 
 function CancelPage() {
   const [orderId, setOrderId] = useState("");
@@ -15,11 +16,11 @@ function CancelPage() {
 
     try {
       const response = await fetch(
-        `http://18.130.223.148:8080/orders/${orderId}/cancel?reason=${reason}`,
-        {
-          method: "PUT"
-        }
-      );
+      `${API}/orders/${orderId}/cancel?reason=${reason}`,
+       {
+         method: "PUT"
+      }
+     );
 
       if (response.ok) {
         setMessage(" Order cancelled successfully");
