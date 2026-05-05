@@ -7,6 +7,11 @@ function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const [lastUpdateTime, setLastUpdateTime] = useState(0);
 
+  //stable sort
+  const sortOrders = (list) => {
+    return [...list].sort((a, b) => a.id - b.id);
+  };
+
   useEffect(() => {
     const fetchOrders = () => {
       if (Date.now() - lastUpdateTime < 2000) return;
@@ -14,7 +19,7 @@ function OrdersPage() {
       fetch(`${API}/orders`)
         .then(res => res.json())
         .then(data => {
-          setOrders(data);
+          setOrders(sortOrders(data));
           setLoading(false);
         })
         .catch(err => {
@@ -29,7 +34,7 @@ function OrdersPage() {
     return () => clearInterval(interval);
   }, [lastUpdateTime]);
 
-  //hide archived orders
+  //  hide archived orders
   const visibleOrders = orders.filter(
     o => o.status !== "Collected" && o.status !== "Cancelled"
   );
@@ -52,23 +57,26 @@ function OrdersPage() {
     });
 
     setOrders(prev =>
-      prev.map(o =>
-        o.id === orderId ? { ...o, status } : o
+      sortOrders(
+        prev.map(o =>
+          o.id === orderId ? { ...o, status } : o
+        )
       )
     );
 
     setLastUpdateTime(Date.now());
   };
 
-  // cancel + archive
   const cancelOrder = async (orderId) => {
     await fetch(`${API}/orders/${orderId}/staff-cancel?reason=OUT_OF_STOCK`, {
       method: "PUT"
     });
 
     setOrders(prev =>
-      prev.map(o =>
-        o.id === orderId ? { ...o, status: "Cancelled" } : o
+      sortOrders(
+        prev.map(o =>
+          o.id === orderId ? { ...o, status: "Cancelled" } : o
+        )
       )
     );
 
@@ -201,6 +209,7 @@ function OrdersPage() {
               </button>
 
             </div>
+
           </div>
         ))}
       </div>
