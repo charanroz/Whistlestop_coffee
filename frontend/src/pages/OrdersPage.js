@@ -30,15 +30,20 @@ function OrdersPage() {
   };
 
   const updateStatus = async (orderId, status) => {
-    await fetch(`${API}/orders/${orderId}/status?status=${status}`), {
+    await fetch(`${API}/orders/${orderId}/status?status=${status}`, {
       method: "PUT"
-    };
+    });
+
+    // refresh orders
+    const res = await fetch(`${API}/orders`);
+    const data = await res.json();
+    setOrders(data);
   };
 
   const cancelOrder = async (orderId) => {
-    await fetch(`${API}/orders/${orderId}/staff-cancel?reason=OUT_OF_STOCK`), {
+    await fetch(`${API}/orders/${orderId}/staff-cancel?reason=OUT_OF_STOCK`, {
       method: "PUT"
-    };
+    });
   };
 
   const buttonStyle = {
