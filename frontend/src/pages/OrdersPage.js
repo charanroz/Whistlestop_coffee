@@ -34,16 +34,23 @@ function OrdersPage() {
       method: "PUT"
     });
 
-    // refresh orders
-    const res = await fetch(`${API}/orders`);
-    const data = await res.json();
-    setOrders(data);
+    setOrders(prev =>
+      prev.map(o =>
+        o.id === orderId ? { ...o, status } : o
+      )
+    );
   };
 
   const cancelOrder = async (orderId) => {
     await fetch(`${API}/orders/${orderId}/staff-cancel?reason=OUT_OF_STOCK`, {
       method: "PUT"
     });
+
+    setOrders(prev =>
+      prev.map(o =>
+        o.id === orderId ? { ...o, status: "Cancelled" } : o
+      )
+    );
   };
 
   const buttonStyle = {
