@@ -1,13 +1,11 @@
-FROM maven:3.9.6-eclipse-temurin-17 AS build
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 
-# copy only backend
 COPY backend ./backend
-
 WORKDIR /app/backend
 RUN mvn clean package -DskipTests
 
-FROM eclipse-temurin:17-jdk
+FROM eclipse-temurin:21-jdk
 WORKDIR /app
 
 COPY --from=build /app/backend/target/*.jar app.jar
