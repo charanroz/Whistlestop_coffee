@@ -191,7 +191,7 @@ public class OrderManager {
     }
 
     public boolean cancelOrder(int id, String reason) {
-
+        System.out.println("🚨 [DEBUG] 收到取消請求！訂單ID: " + id + ", 傳來的原因是: [" + reason + "]");
         Order order = orderRepository.findById(id).orElse(null);
         if (order == null) return false;
 
@@ -204,6 +204,7 @@ public class OrderManager {
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
 
@@ -216,10 +217,36 @@ public class OrderManager {
 
 
     public void staffCancelOrder(int id, String reason) {
-
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
+        order.setStatus("Cancelled");
+        order.setCancelReason(reason);
+        //confirm customer is late more than 15mins
+        if ("CUSTOMER_LATE".equals(reason)) {
+            try {
+                String timeStr = order.getPickupTime();
+                String timeOnly = timeStr;
+                if (timeStr != null && timeStr.contains(" ")) {
+                    timeOnly = timeStr.split(" ")[1];
+                }
+
+                LocalTime pickup = LocalTime.parse(timeOnly);
+                LocalTime now = LocalTime.now();
+
+                // It cannot be canceled less than 15mins
+                if (now.isBefore(pickup.plusMinutes(15))) {
+                    throw new RuntimeException("Cannot cancel: 15 minutes have not passed.");
+                }
+
+            } catch (RuntimeException re) {
+                throw re; // return to Controller
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException("Unable to verify the time");
+            }
+        }
+        //Order can be saved due to verify the time(>15mins) or out of stock
         order.setStatus("Cancelled");
         order.setCancelReason(reason);
 
