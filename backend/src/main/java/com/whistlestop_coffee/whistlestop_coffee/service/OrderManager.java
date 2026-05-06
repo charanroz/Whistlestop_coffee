@@ -191,7 +191,6 @@ public class OrderManager {
     }
 
     public boolean cancelOrder(int id, String reason) {
-        System.out.println("🚨 [DEBUG] 收到取消請求！訂單ID: " + id + ", 傳來的原因是: [" + reason + "]");
         Order order = orderRepository.findById(id).orElse(null);
         if (order == null) return false;
 
