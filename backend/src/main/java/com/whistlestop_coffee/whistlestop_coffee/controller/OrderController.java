@@ -108,4 +108,22 @@ public class OrderController {
     public List<Order> getArchivedOrders() {
         return orderManager.getArchivedOrders();
     }
+
+    // DELETE OLD MOCK ORDERS
+    @DeleteMapping("/delete-mock")
+    public String deleteMockOrders() {
+
+        List<Order> orders = orderManager.getAllOrders();
+
+        for (Order order : orders) {
+
+            if (order.getTrainId() != null &&
+                    order.getTrainId().startsWith("MOCK-")) {
+
+                orderManager.archiveOrder(order.getId());
+            }
+        }
+
+        return "Mock orders archived";
+    }
 }
