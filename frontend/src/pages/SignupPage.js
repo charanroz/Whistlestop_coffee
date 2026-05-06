@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-const API = "https://whistlestop-coffee.onrender.com";
+import API from "../api";
 
 function SignupPage() {
   const [name, setName] = useState("");

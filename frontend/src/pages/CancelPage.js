@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-const API = "https://whistlestop-coffee.onrender.com";
+import API from "../api";
 
 function CancelPage() {
   const [orderId, setOrderId] = useState("");

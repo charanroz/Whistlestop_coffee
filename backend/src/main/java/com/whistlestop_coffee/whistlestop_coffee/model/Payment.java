@@ -22,12 +22,14 @@ public class Payment {
     public Payment(String orderId, LocalDateTime paidAt) {
         this.orderId = orderId;
         this.paidAt = paidAt;
+        this.confirmedTime = paidAt;
     }
 
     public Payment(int id, String orderId, LocalDateTime paidAt) {
         this.id = id;
         this.orderId = orderId;
         this.paidAt = paidAt;
+        this.confirmedTime = paidAt;
     }
     public LocalDateTime getConfirmedTime() {
         return confirmedTime;

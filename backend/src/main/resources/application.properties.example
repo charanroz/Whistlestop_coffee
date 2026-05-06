@@ -47,3 +47,9 @@ nwr.schedule.kafka.topic=prod-1010-Darwin-Train-Information-Push-Port-IIII2_0-JS
 networkrail.cramlington.stanox=12136
 networkrail.cramlington.tiploc=CRMLNGT
 networkrail.cramlington.crs=CRM
+
+# Live Departure Board API from Rail Data Marketplace.
+# Set RAIL_LDB_API_KEY in your local environment or IntelliJ Run Configuration.
+rail.ldb.api-key=${RAIL_LDB_API_KEY:}
+rail.ldb.base-url=https://api1.raildata.org.uk/1010-live-departure-board-dep1_2/LDBWS/api/20220120
+rail.ldb.num-rows=20

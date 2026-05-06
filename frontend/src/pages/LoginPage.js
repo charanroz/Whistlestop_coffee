@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import API from "../api";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -10,8 +11,6 @@ function LoginPage() {
 
   const handleLogin = async () => {
     try {
-      const API = "https://whistlestop-coffee.onrender.com";
-
       const url =
         role === "STAFF"
           ? `${API}/api/staff/login`

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-const API = "https://whistlestop-coffee.onrender.com";
+import API from "../api";
 
 function CheckoutPage() {
   const { orderId } = useParams();
@@ -9,6 +9,11 @@ function CheckoutPage() {
   const [paymentResult, setPaymentResult] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const formatPaymentTime = (value) => {
+    if (!value) return "Just now";
+    return new Date(value).toLocaleString();
+  };
 
   const handlePayment = async () => {
     setLoading(true);
@@ -79,7 +84,7 @@ function CheckoutPage() {
           <p><strong>Order ID:</strong> {paymentResult.orderId}</p>
           <p>
             <strong>Time:</strong>{" "}
-            {new Date(paymentResult.confirmedTime).toLocaleString()}
+            {formatPaymentTime(paymentResult.confirmedTime)}
           </p>
         </div>
       )}

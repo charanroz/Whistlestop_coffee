@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
@@ -83,6 +84,7 @@ public class OrderManager {
 
         order.setCustomer(dbCustomer);
         order.setStatus("Pending");
+        normalizeOrderTimes(order);
 
         BigDecimal total = BigDecimal.ZERO;
 
@@ -118,6 +120,28 @@ public class OrderManager {
         order.setTotal(total);
 
         return orderRepository.save(order);
+    }
+
+    private void normalizeOrderTimes(Order order) {
+        order.setPickupTime(toDatedTime(order.getPickupTime()));
+        order.setEstimatedArrivalTime(toDatedTime(order.getEstimatedArrivalTime()));
+    }
+
+    private String toDatedTime(String value) {
+        if (value == null || value.isBlank() || value.contains(" ")) {
+            return value;
+        }
+
+        try {
+            LocalTime time = LocalTime.parse(value);
+            LocalDate date = LocalDate.now();
+            if (time.isBefore(LocalTime.now())) {
+                date = date.plusDays(1);
+            }
+            return date + " " + time;
+        } catch (Exception ignored) {
+            return value;
+        }
     }
 
     // ➕ ADD ITEM TO ORDER

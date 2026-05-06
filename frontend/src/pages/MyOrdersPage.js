@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-const API = "https://whistlestop-coffee.onrender.com";
+import API from "../api";
 
 function MyOrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -26,6 +26,10 @@ function MyOrdersPage() {
     return () => clearInterval(interval);
   }, [user]);
 
+  const visibleOrders = orders.filter(order =>
+    !order.archived &&
+    !String(order.trainId || "").startsWith("MOCK-")
+  );
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -52,6 +56,13 @@ function MyOrdersPage() {
     }
   };
 
+  const formatDisplayDateTime = (value) => {
+    if (!value) return "";
+    const [date, time] = value.split(" ");
+    if (!time) return value;
+    return `${time} (${date})`;
+  };
+
   return (
     <div style={{
       padding: "20px",
@@ -66,11 +77,11 @@ function MyOrdersPage() {
         </p>
       )}
 
-      {user && orders.length === 0 && (
+      {user && visibleOrders.length === 0 && (
         <p style={{ textAlign: "center" }}>No orders yet</p>
       )}
 
-      {orders.map(order => (
+      {visibleOrders.map(order => (
         <div key={order.id} style={{
           background: "white",
           padding: "20px",
@@ -98,7 +109,7 @@ function MyOrdersPage() {
 
           <p>{getStatusMessage(order.status)}</p>
 
-          <p><strong>Pickup:</strong> {order.pickupTime}</p>
+          <p><strong>Pickup:</strong> {formatDisplayDateTime(order.pickupTime)}</p>
           {order.trainId && (
             <p style={{ color: "#e65100", fontWeight: "bold" }}>
               🚆 Train: {order.trainId}

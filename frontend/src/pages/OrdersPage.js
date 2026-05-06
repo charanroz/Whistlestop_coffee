@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-
-const API = "https://whistlestop-coffee.onrender.com";
+import API from "../api";
 //test API
 //const API = "http://localhost:8080";
 function OrdersPage() {
@@ -39,7 +38,10 @@ function OrdersPage() {
 
   //  hide archived orders
   const visibleOrders = orders.filter(
-    o => o.status !== "Collected" && o.status !== "Cancelled"
+    o => !o.archived &&
+      !String(o.trainId || "").startsWith("MOCK-") &&
+      o.status !== "Collected" &&
+      o.status !== "Cancelled"
   );
 
   const getStatusStyle = (status) => {
@@ -52,6 +54,13 @@ function OrdersPage() {
       case "Cancelled": return { background: "#ffcdd2", color: "#b71c1c" };
       default: return {};
     }
+  };
+
+  const formatDisplayDateTime = (value) => {
+    if (!value) return "";
+    const [date, time] = value.split(" ");
+    if (!time) return value;
+    return `${time} (${date})`;
   };
 
   const updateStatus = async (orderId, status) => {
@@ -150,7 +159,7 @@ function OrdersPage() {
               {order.status}
             </span>
 
-            <p><strong>Pickup:</strong> {order.pickupTime}</p>
+            <p><strong>Pickup:</strong> {formatDisplayDateTime(order.pickupTime)}</p>
 
             {order.trainId && (
               <p style={{ color: "#e65100", fontWeight: "bold" }}>

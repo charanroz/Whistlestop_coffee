@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-const API = "https://whistlestop-coffee.onrender.com";
+import API from "../api";
 
 function MenuPage() {
   const [menu, setMenu] = useState([]);
@@ -101,15 +101,35 @@ function MenuPage() {
 
   // หาวันที่ของ pickup (วันนี้หรือวันถัดไปที่เปิด)
   const getPickupDate = () => {
+    const formatLocalDate = (date) =>
+      `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
     if (!todayHours || todayHours.closed) {
       const next = getNextOpenDay();
       if (next) {
         const d = new Date();
         d.setDate(d.getDate() + next.daysAhead);
-        return d.toISOString().split("T")[0];
+        return formatLocalDate(d);
       }
     }
-    return new Date().toISOString().split("T")[0];
+    return formatLocalDate(new Date());
+  };
+
+  const toDatedTime = (time) => {
+    if (!time) return "";
+    if (String(time).includes(" ")) return time;
+
+    const today = new Date();
+    const [hour, minute] = String(time).split(":").map(Number);
+    const target = new Date(today);
+    target.setHours(hour, minute || 0, 0, 0);
+
+    if (target < today) {
+      target.setDate(target.getDate() + 1);
+    }
+
+    const date = `${target.getFullYear()}-${String(target.getMonth() + 1).padStart(2, "0")}-${String(target.getDate()).padStart(2, "0")}`;
+    return `${date} ${String(hour).padStart(2, "0")}:${String(minute || 0).padStart(2, "0")}`;
   };
 
   // ✅ FIXED: time slots — ถ้าวันนี้ปิด ใช้วันถัดไปที่เปิด
@@ -218,12 +238,15 @@ function MenuPage() {
     }
 
     const pickupDateTime = `${getPickupDate()} ${pickupTime}`;
+    const trainDateTime = pickupType === "train"
+      ? toDatedTime(selectedTrain.estimatedArrivalTime)
+      : null;
 
     const order = {
       customer: { id: user.id },
-      pickupTime: pickupType === "train" ? selectedTrain.estimatedArrivalTime : pickupDateTime,
+      pickupTime: pickupType === "train" ? trainDateTime : pickupDateTime,
       trainId: pickupType === "train" ? selectedTrain.trainId : null,
-      estimatedArrivalTime: pickupType === "train" ? selectedTrain.estimatedArrivalTime : pickupDateTime,
+      estimatedArrivalTime: pickupType === "train" ? trainDateTime : pickupDateTime,
       items: cart.map(i => ({ menuItemId: i.id, size: i.size, quantity: i.quantity }))
     };
 

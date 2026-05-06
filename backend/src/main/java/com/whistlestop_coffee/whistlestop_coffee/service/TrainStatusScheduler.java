@@ -31,14 +31,28 @@ public class TrainStatusScheduler {
         for (Order order : activeOrders) {
             Train train = trainService.getTrainStatus(order.getTrainId());
             if (train != null) {
+                String estimatedArrivalTime = withExistingDate(order.getEstimatedArrivalTime(), train.getEstimatedArrivalTime());
                 // If the train's estimated arrival time is different from the order's estimated arrival time, update the order
-                if (!train.getEstimatedArrivalTime().equals(order.getEstimatedArrivalTime())) {
-                    System.out.println("Train " + train.getTrainId() + " delayed! Updating order #" + order.getId() + " pickup time to " + train.getEstimatedArrivalTime());
-                    order.setEstimatedArrivalTime(train.getEstimatedArrivalTime());
-                    order.setPickupTime(train.getEstimatedArrivalTime());
+                if (!estimatedArrivalTime.equals(order.getEstimatedArrivalTime())) {
+                    System.out.println("Train " + train.getTrainId() + " delayed! Updating order #" + order.getId() + " pickup time to " + estimatedArrivalTime);
+                    order.setEstimatedArrivalTime(estimatedArrivalTime);
+                    order.setPickupTime(estimatedArrivalTime);
                     orderRepository.save(order);
                 }
             }
         }
+    }
+
+    private String withExistingDate(String existingDateTime, String newTime) {
+        if (newTime == null || newTime.isBlank()) {
+            return existingDateTime;
+        }
+        if (newTime.contains(" ")) {
+            return newTime;
+        }
+        if (existingDateTime != null && existingDateTime.contains(" ")) {
+            return existingDateTime.split(" ")[0] + " " + newTime;
+        }
+        return newTime;
     }
 }
