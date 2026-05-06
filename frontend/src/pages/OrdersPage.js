@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 
 const API = "https://whistlestop-coffee.onrender.com";
-
+//test API
+//const API = "http://localhost:8080";
 function OrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdateTime, setLastUpdateTime] = useState(0);
 
+  //check Order_state for cancelling
+  const [cancellingOrderId, setCancellingOrderId] = useState(null);
   //stable sort
   const sortOrders = (list) => {
     return [...list].sort((a, b) => a.id - b.id);
@@ -67,11 +70,16 @@ function OrdersPage() {
     setLastUpdateTime(Date.now());
   };
 
-  const cancelOrder = async (orderId) => {
-    await fetch(`${API}/orders/${orderId}/staff-cancel?reason=OUT_OF_STOCK`, {
+  const submitCancel = async (orderId, reason) => {
+    try{
+    const response = await fetch(`${API}/orders/${orderId}/staff-cancel?reason=${reason}`, {
       method: "PUT"
     });
-
+      // check the time from backend
+      if (!response.ok) {
+        alert("cancellation is failed !\n Please check customer is late more than 15 minutes.");
+        return;
+      }
     setOrders(prev =>
       sortOrders(
         prev.map(o =>
@@ -81,6 +89,12 @@ function OrdersPage() {
     );
 
     setLastUpdateTime(Date.now());
+    setCancellingOrderId(null);
+
+      } catch (error) {
+        console.error("Cancel API error:", error);
+        alert("connection is failed. \n Please try again.");
+      }
   };
 
   const buttonStyle = {
@@ -161,7 +175,31 @@ function OrdersPage() {
               flexWrap: "wrap",
               gap: "5px"
             }}>
-
+              {/* fix：click Cancel and open reason option */}
+              {cancellingOrderId === order.id ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
+                    <p style={{ margin: "5px 0", fontWeight: "bold", color: "#e74c3c" }}>Which is the reason for cancellation?：</p>
+                    <button
+                        style={{ ...buttonStyle, background: "#f39c12", color: "white" }}
+                        onClick={() => submitCancel(order.id, "OUT_OF_STOCK")}
+                    >
+                      1. Out of stock
+                    </button>
+                    <button
+                        style={{ ...buttonStyle, background: "#f39c12", color: "white" }}
+                        onClick={() => submitCancel(order.id, "CUSTOMER_LATE")}
+                    >
+                      2. Late 15+ minutes
+                    </button>
+                    <button
+                        style={{ ...buttonStyle, background: "#95a5a6", color: "white" }}
+                        onClick={() => setCancellingOrderId(null)} // return
+                    >
+                      Back
+                    </button>
+                  </div>
+              ) : (
+                  <>
               <button
                 style={buttonStyle}
                 disabled={order.status !== "Pending"}
@@ -203,11 +241,12 @@ function OrdersPage() {
                   color: "white"
                 }}
                 disabled={order.status === "Collected" || order.status === "Cancelled"}
-                onClick={() => cancelOrder(order.id)}
+                onClick={() => setCancellingOrderId(order.id)}
               >
                 Cancel
               </button>
-
+</>
+)}
             </div>
 
           </div>
