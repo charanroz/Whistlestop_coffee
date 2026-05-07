@@ -32,7 +32,7 @@ When accessing the application for the first time, or after a period of inactivi
 ## Staff Access
 
 To access the staff dashboard, use the following credentials:
-- **Username:** `admin@coffe.com`
+- **Username:** `admin@coffee.com`
 - **Password:** `1234`
 
 ---
@@ -41,7 +41,7 @@ To access the staff dashboard, use the following credentials:
 
 | Layer | Technology |
 |---|---|
-| Backend | Spring Boot 3, Spring Kafka, H2 Database |
+| Backend | Spring Boot 3, Spring Kafka, PostgreSQL |
 | Frontend | React 18 |
 | Real-time data | Confluent Cloud Kafka (NWR Train Movements) |
 | Schedule data | Rail Data Marketplace (NWR Schedule CIF JSON) |
@@ -78,7 +78,7 @@ The default config already has Kafka **disabled**, so the app runs immediately w
 3. Wait for Maven to download dependencies (progress bar at bottom-right)
 4. Open `src/main/java/.../WhistlestopCoffeeApplication.java`
 5. Click the green ▶ **Run** button
-6. Backend starts on **http://18.130.223.148:8080**
+6. Backend starts on **http://localhost:8080**
 
 On first startup you will see in the console:
 ```
