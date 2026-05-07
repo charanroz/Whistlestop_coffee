@@ -1,5 +1,9 @@
 package com.whistlestop_coffee.whistlestop_coffee.service;
 
+/**
+ * Generic wrapper for authentication responses.
+ * Simplifies frontend error handling by providing a success flag and message.
+ */
 public class LoginResult {
 
     private boolean success;

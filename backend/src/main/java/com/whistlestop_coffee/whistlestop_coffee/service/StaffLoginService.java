@@ -8,6 +8,9 @@ import com.whistlestop_coffee.whistlestop_coffee.dto.LoginResult;
 
 import java.util.List;
 
+/**
+ * Handles authentication for staff accessing the management dashboard.
+ */
 @Service
 public class StaffLoginService {
 
@@ -24,6 +27,8 @@ public class StaffLoginService {
 
         Staff staff = staffList.get(0);
 
+        // Note: Plaintext password comparison is used here for the university prototype.
+        // In a real production system, this must be replaced with BCrypt hashing.
         if (!staff.getPassword().equals(password)) {
             return new LoginResult(false, "Incorrect password", null);
         }

@@ -5,6 +5,9 @@ import com.whistlestop_coffee.whistlestop_coffee.service.StationSettingManager;
 import org.springframework.web.bind.annotation.*;
 import com.whistlestop_coffee.whistlestop_coffee.dto.LoginResult;
 
+/**
+ * Manages kiosk-wide settings like Station Name and Header text.
+ */
 @RestController
 @RequestMapping("/station-setting")
 @CrossOrigin(origins = "*", allowedHeaders = "*")

@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Mock payment gateway controller.
+ */
 @RestController
 @RequestMapping("/payments")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -15,6 +18,10 @@ public class PaymentController {
     @Autowired
     private PaymentManager paymentManager;
 
+    /**
+     * Simulates payment processing.
+     * Maps the internal Payment model to a PaymentResponse DTO for frontend safety.
+     */
     @PostMapping("/process")
     public ResponseEntity<?> processPayment(@RequestParam String orderId) {
         try {

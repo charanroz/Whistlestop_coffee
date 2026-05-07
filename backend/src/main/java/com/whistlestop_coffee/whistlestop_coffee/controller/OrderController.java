@@ -8,6 +8,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Order processing endpoints.
+ * Handles order submission, status tracking, and archiving.
+ */
 @RestController
 @RequestMapping("/orders")
 @CrossOrigin(origins = "*", allowedHeaders = "*")

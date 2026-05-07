@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Manages store operating hours and validates if order times are allowed.
+ */
 @Service
 public class BusinessHourManager {
 
@@ -44,7 +47,7 @@ public class BusinessHourManager {
         if (businessHour.getOpenTime() == null || businessHour.getCloseTime() == null) {
             return false;
         }
-
+        // Compare using string lexicographical order as HH:mm is sortable
         return time.compareTo(businessHour.getOpenTime()) >= 0
                 && time.compareTo(businessHour.getCloseTime()) <= 0;
     }

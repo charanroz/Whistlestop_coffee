@@ -2,9 +2,10 @@ package com.whistlestop_coffee.whistlestop_coffee.dto;
 
 import com.whistlestop_coffee.whistlestop_coffee.model.MenuItem;
 
-// I learned that we shouldn't send the raw database entity directly to the frontend.
-// This is a DTO class so we only send the safe data the customer needs to see,
-// keeping internal flags like 'isDeleted' hidden.
+/**
+ * DTO used to transfer menu data to the frontend.
+ * Decouples the API from the database schema to hide internal flags like 'isDeleted'.
+ */
 public class MenuItemResponse {
     public int id;
     public String name;
@@ -13,7 +14,10 @@ public class MenuItemResponse {
     public boolean available;
     public boolean hasSize;
 
-    // Helper method to copy data from the MenuItem database entity into this DTO object.
+    /**
+     * Static factory method to map Entity to DTO.
+     * Ensures the UI only receives data it actually needs to render.
+     */
     public static MenuItemResponse from(MenuItem item) {
         MenuItemResponse res = new MenuItemResponse();
         res.id = item.getId();

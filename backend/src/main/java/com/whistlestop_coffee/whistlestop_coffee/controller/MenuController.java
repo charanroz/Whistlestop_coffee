@@ -1,16 +1,19 @@
 package com.whistlestop_coffee.whistlestop_coffee.controller;
-
 import com.whistlestop_coffee.whistlestop_coffee.dto.MenuItemResponse;
 import com.whistlestop_coffee.whistlestop_coffee.service.MenuManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
-// This controller receives HTTP requests from the React frontend and passes them to the MenuManager.
+/**
+ * REST endpoints for menu management.
+ * Bridges the frontend UI with the MenuManager business logic.
+ */
 @RestController
 @RequestMapping("/menu")
-// I added this @CrossOrigin because I was getting CORS blocking errors when testing with the frontend.
+// I added this @CrossOrigin because I was getting
+// CORS blocking errors
+// when testing with the frontend.
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class MenuController {
 

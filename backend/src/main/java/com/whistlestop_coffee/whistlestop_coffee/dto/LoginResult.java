@@ -1,5 +1,9 @@
 package com.whistlestop_coffee.whistlestop_coffee.dto;
 
+/**
+ * Standardized response for all authentication attempts.
+ * Includes a status flag and descriptive message for frontend toast notifications.
+ */
 public class LoginResult {
 
     private boolean success;

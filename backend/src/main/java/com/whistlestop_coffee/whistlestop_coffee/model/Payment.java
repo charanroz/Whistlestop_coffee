@@ -6,7 +6,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 
-
+/**
+ * Audit record for financial transactions.
+ * Decoupled from the Order entity to allow independent lifecycle management (e.g., future refunds).
+ */
 @Entity
 public class Payment {
 

@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.whistlestop_coffee.whistlestop_coffee.dto.LoginResult;
 
+/**
+ * Handles customer authentication and registration.
+ */
 @Service
 public class CustomerLoginService {
 
@@ -14,7 +17,7 @@ public class CustomerLoginService {
 
     // LOGIN
     public LoginResult login(String email, String password) {
-
+        // Basic presence check before DB query
         if (email == null || email.trim().isEmpty()) {
             return new LoginResult(false, "Email cannot be empty", null);
         }

@@ -5,6 +5,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+/**
+ * Represents a registered customer.
+ * Plaintext password used for this prototype; encryption would be added for production.
+ */
 @Entity
 public class Customer {
 
@@ -30,6 +34,7 @@ public class Customer {
         this.password = password;
     }
 
+    // Getters and Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public String getName() { return name; }

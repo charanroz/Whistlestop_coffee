@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * Join entity resolving the many-to-many relationship between Orders and MenuItems.
+ */
 @Entity
 public class OrderItem {
 
@@ -14,8 +17,16 @@ public class OrderItem {
     private int quantity;
     private String size;
 
+    /**
+     * Price snapshot at the time of purchase.
+     * Ensures historical order totals don't change if the global menu price is updated later.
+     */
     private BigDecimal unitPrice;
 
+    /**
+     * Temporary field used for mapping incoming JSON payloads before the JPA association is built.
+     * Not persisted to the database.
+     */
     @Transient
     private Integer menuItemId;
 

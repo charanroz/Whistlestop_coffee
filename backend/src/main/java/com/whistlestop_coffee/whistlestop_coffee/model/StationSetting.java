@@ -2,6 +2,11 @@ package com.whistlestop_coffee.whistlestop_coffee.model;
 
 import jakarta.persistence.*;
 
+/**
+ * Global configuration singleton stored in the database.
+ * Allows staff to reconfigure the kiosk location dynamically via the dashboard
+ * without needing to alter backend properties or redeploy the app.
+ */
 @Entity
 public class StationSetting {
 

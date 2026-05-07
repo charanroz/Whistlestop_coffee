@@ -5,6 +5,10 @@ import com.whistlestop_coffee.whistlestop_coffee.model.Order;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Formats order data for the UI.
+ * Replaces complex object relationships with simple fields for easier frontend parsing.
+ */
 public class OrderResponse {
 
     public int orderId;
@@ -21,6 +25,7 @@ public class OrderResponse {
 
         res.orderId = order.getId();
 
+        // Handling potential nulls for Guest checkouts
         res.customerName = (order.getCustomer() != null)
                 ? order.getCustomer().getName()
                 : "Guest";

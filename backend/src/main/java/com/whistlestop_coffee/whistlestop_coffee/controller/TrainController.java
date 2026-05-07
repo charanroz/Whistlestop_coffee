@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Proxy for train data. Fetches upcoming arrivals for the kiosk display.
+ */
 @RestController
 @RequestMapping("/trains")
 @CrossOrigin(origins = "*", allowedHeaders = "*")

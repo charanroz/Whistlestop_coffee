@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+/**
+ * Local simulation of National Rail data.
+ * Used for development when the real Kafka/LDBWS APIs are unavailable.
+ */
 @Profile("mock")
 @Service
 public class MockTrainService implements TrainService {
@@ -34,8 +38,8 @@ public class MockTrainService implements TrainService {
             LocalTime scheduled = now.plusMinutes(10 + (i * 15));
             String status = "On time";
             LocalTime estimated = scheduled;
-            
-            // Randomly delay some trains
+
+            // Randomly delay some trains to test the UI's handling of late arrivals
             if (random.nextDouble() > 0.6) {
                 int delayMins = 5 + random.nextInt(25);
                 estimated = scheduled.plusMinutes(delayMins);

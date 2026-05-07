@@ -1,5 +1,8 @@
 package com.whistlestop_coffee.whistlestop_coffee.dto;
 
+/**
+ * Simple POJO for capturing login credentials from the request body.
+ */
 public class LoginRequest {
     private String email;
     private String password;

@@ -2,6 +2,9 @@ package com.whistlestop_coffee.whistlestop_coffee.dto;
 
 import java.time.LocalDateTime;
 
+/**
+ * Encapsulates the results of a mock payment transaction.
+ */
 public class PaymentResponse {
 
     private int paymentId;

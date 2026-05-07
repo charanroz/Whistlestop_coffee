@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.Optional;
 import com.whistlestop_coffee.whistlestop_coffee.repository.PaymentRepository;
 
+/**
+ * Handles mock payment processing.
+ * In a fully deployed system, this would integrate with external gateways (e.g., Stripe) via webhooks.
+ */
 @Service
 public class PaymentManager {
 

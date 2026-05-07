@@ -9,6 +9,10 @@ import com.whistlestop_coffee.whistlestop_coffee.dto.LoginResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Authentication endpoint for customers.
+ * Standardises response via LoginResult DTO.
+ */
 @RestController
 @RequestMapping("/api/customer")
 @CrossOrigin(origins = "*", allowedHeaders = "*")

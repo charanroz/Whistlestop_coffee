@@ -5,6 +5,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+/**
+ * Represents an administrative user for the dashboard.
+ * Note: Plaintext passwords are used strictly for this academic prototype.
+ * A production environment would require BCrypt hashing and Spring Security integration.
+ */
 @Entity
 public class Staff {
 

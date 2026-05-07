@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// This class handles the main business logic.
-// Keeping this separate from the Controller makes the code cleaner.
+/**
+ * Handles menu business rules.
+ * Uses DTOs to decouple internal database entities from the API layer.
+ */
 @Service
 public class MenuManager {
 
@@ -18,7 +20,7 @@ public class MenuManager {
     private MenuItemRepository repository;
 
     public List<MenuItemResponse> getAvailableMenu() {
-        // Find items that are not deleted and in stock, then convert them to DTOs
+        // Only return items that are both in stock and not logically deleted
         return repository.findByIsAvailableTrueAndIsDeletedFalse()
                 .stream()
                 .map(MenuItemResponse::from)
@@ -52,7 +54,7 @@ public class MenuManager {
 
     public void deleteMenuItem(int id) {
         repository.findById(id).ifPresent(item -> {
-            // We just update the flags instead of actually deleting the row from database
+            // Soft delete: keep record in DB to maintain foreign key integrity for old orders
             item.setDeleted(true);
             item.setAvailable(false); // Also make it out of stock just in case
             repository.save(item);

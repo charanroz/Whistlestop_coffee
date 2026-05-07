@@ -5,7 +5,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-// This class maps to the menu_item table in our database.
+/**
+ * Menu item entity mapped to the database.
+ */
 @Entity
 public class MenuItem {
 
@@ -21,8 +23,11 @@ public class MenuItem {
 
     private boolean isAvailable;
 
-    // I added this flag for "soft delete".
-    // If we actually delete a menu item from the database, past orders might break.
+    /**
+     * Soft delete flag.
+     * Crucial for maintaining referential integrity in the 'orders' table
+     * even if a product is discontinued.
+     */
     private boolean isDeleted;
 
     public MenuItem() {}

@@ -7,6 +7,9 @@ import com.whistlestop_coffee.whistlestop_coffee.service.StaffLoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Secure login for the staff management dashboard.
+ */
 @RestController
 @RequestMapping("/api/staff")
 @CrossOrigin(origins = "*", allowedHeaders = "*")

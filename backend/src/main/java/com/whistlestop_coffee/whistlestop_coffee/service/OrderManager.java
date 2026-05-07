@@ -13,6 +13,10 @@ import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Core business logic for handling order lifecycles.
+ * Manages order creation, business hour validation, and cancellation rules.
+ */
 @Service
 public class OrderManager {
 

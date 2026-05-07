@@ -7,7 +7,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Primary
+/**
+ * Production implementation of TrainService.
+ * Fetches live data from the National Rail LDBWS API.
+ */
+@Primary // Instructs Spring to use this implementation by default over the Mock version
 @Service
 public class RealTrainService implements TrainService {
 

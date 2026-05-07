@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Interface for managing and checking store operating hours.
+ */
 @RestController
 @RequestMapping("/business-hours")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -35,6 +38,9 @@ public class BusinessHourController {
         return businessHourManager.updateBusinessHour(dayOfWeek, updatedBusinessHour);
     }
 
+    /**
+     * Helper endpoint for the frontend to check if a specific time is within hours.
+     */
     @GetMapping("/check")
     public boolean checkBusinessHours(
             @RequestParam String dayOfWeek,

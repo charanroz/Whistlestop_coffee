@@ -2,6 +2,10 @@ package com.whistlestop_coffee.whistlestop_coffee.model;
 
 import jakarta.persistence.*;
 
+/**
+ * Stores the kiosk's weekly operating hours.
+ * 'closed' flag allows for full-day closures (e.g., Sundays) without clearing time data.
+ */
 @Entity
 public class BusinessHour {
 

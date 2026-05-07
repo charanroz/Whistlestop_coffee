@@ -10,6 +10,10 @@ import org.springframework.web.client.RestClient;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Connects to the Rail Data Marketplace (RDM) LDBWS API.
+ * Fetches the live "Next Train" board for the kiosk display.
+ */
 @Service
 public class LiveDepartureBoardService {
 

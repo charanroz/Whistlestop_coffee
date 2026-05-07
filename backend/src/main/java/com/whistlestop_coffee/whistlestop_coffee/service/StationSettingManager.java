@@ -6,6 +6,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Manages global kiosk configurations (e.g., station name).
+ * Acts as a database singleton, auto-initializing default values if the table is empty.
+ */
 @Service
 public class StationSettingManager {
 

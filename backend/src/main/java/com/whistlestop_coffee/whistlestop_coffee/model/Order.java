@@ -6,6 +6,10 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Main Order entity.
+ * Represents a customer's purchase, including their items and pickup details.
+ */
 @Entity
 @Table(name = "orders")
 public class Order {
@@ -28,6 +32,10 @@ public class Order {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
+    /**
+     * Bidirectional relationship with OrderItem.
+     * @JsonIgnoreProperties is critical here to prevent infinite recursion during JSON serialization.
+     */
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @JsonIgnoreProperties({"order"})
     private List<OrderItem> items = new ArrayList<>();

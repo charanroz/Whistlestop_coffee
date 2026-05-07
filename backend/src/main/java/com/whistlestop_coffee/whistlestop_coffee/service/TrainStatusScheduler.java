@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Background job that synchronises active orders with live train delays.
+ */
 @Service
 public class TrainStatusScheduler {
 
@@ -19,7 +22,11 @@ public class TrainStatusScheduler {
         this.trainService = trainService;
     }
 
-    // Run every 30 seconds
+    /**
+     * Polls every 30 seconds.
+     * Automatically pushes back the coffee pickup time if the customer's train is delayed,
+     * ensuring the coffee doesn't go cold before they arrive.
+     */
     @Scheduled(fixedRate = 30000)
     public void updatePickupTimesBasedOnTrainDelays() {
         // Find all active orders that are associated with a train

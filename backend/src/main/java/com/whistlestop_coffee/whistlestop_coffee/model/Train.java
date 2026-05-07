@@ -1,5 +1,10 @@
 package com.whistlestop_coffee.whistlestop_coffee.model;
 
+/**
+ * Domain model for real-time train data.
+ * Not persisted as a JPA Entity; acts as a transient data structure
+ * for passing Kafka/LDBWS feed data to the frontend.
+ */
 public class Train {
     private String trainId;
     private String origin;
