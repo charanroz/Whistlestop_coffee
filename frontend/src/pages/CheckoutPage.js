@@ -10,49 +10,76 @@ function CheckoutPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // format payment date and time
   const formatPaymentTime = (value) => {
     if (!value) return "Just now";
+
     return new Date(value).toLocaleString();
   };
 
+  // process payment
   const handlePayment = async () => {
     setLoading(true);
 
     try {
+      // send payment request
       const response = await fetch(
         `${API}/payments/process?orderId=${orderId}`,
-         { method: "POST" }
+        {
+          method: "POST"
+        }
       );
 
+      // payment success
       if (response.ok) {
         const paymentData = await response.json();
+
         setPaymentResult(paymentData);
         setErrorMessage("");
 
-        // ✅ redirect after success
+        // redirect after successful payment
         setTimeout(() => {
           navigate("/orders");
         }, 2000);
+
       } else {
+        // show backend error message
         const errorText = await response.text();
         setErrorMessage(errorText);
       }
+
     } catch (error) {
-      setErrorMessage("Server not responding. Check backend.");
+      setErrorMessage(
+        "Server not responding. Check backend."
+      );
     }
 
     setLoading(false);
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "400px", margin: "auto" }}>
+    <div
+      style={{
+        padding: "20px",
+        maxWidth: "400px",
+        margin: "auto"
+      }}
+    >
+
+      {/* Page Title */}
       <h2>💳 Checkout</h2>
 
-      <p><strong>Order ID:</strong> {orderId}</p>
+      {/* Order ID */}
+      <p>
+        <strong>Order ID:</strong> {orderId}
+      </p>
 
+      {/* Payment Button */}
       <button
         onClick={handlePayment}
+
         disabled={loading || paymentResult}
+
         style={{
           padding: "10px",
           width: "100%",
@@ -62,29 +89,53 @@ function CheckoutPage() {
           borderRadius: "5px"
         }}
       >
-        {loading ? "Processing..." : "Pay with HorsePay"}
+        {loading
+          ? "Processing..."
+          : "Pay with HorsePay"}
       </button>
 
+      {/* Error Message */}
       {errorMessage && (
-        <p style={{ color: "red", marginTop: "10px" }}>
+        <p
+          style={{
+            color: "red",
+            marginTop: "10px"
+          }}
+        >
           {errorMessage}
         </p>
       )}
 
+      {/* Payment Success Message */}
       {paymentResult && (
-        <div style={{
-          marginTop: "20px",
-          padding: "15px",
-          border: "1px solid #ddd",
-          borderRadius: "8px",
-          backgroundColor: "#f9f9f9"
-        }}>
-          <h3 style={{ color: "green" }}> Payment Successful</h3>
-          <p><strong>Payment ID:</strong> {paymentResult.paymentId}</p>
-          <p><strong>Order ID:</strong> {paymentResult.orderId}</p>
+        <div
+          style={{
+            marginTop: "20px",
+            padding: "15px",
+            border: "1px solid #ddd",
+            borderRadius: "8px",
+            backgroundColor: "#f9f9f9"
+          }}
+        >
+          <h3 style={{ color: "green" }}>
+            Payment Successful
+          </h3>
+
+          <p>
+            <strong>Payment ID:</strong>{" "}
+            {paymentResult.paymentId}
+          </p>
+
+          <p>
+            <strong>Order ID:</strong>{" "}
+            {paymentResult.orderId}
+          </p>
+
           <p>
             <strong>Time:</strong>{" "}
-            {formatPaymentTime(paymentResult.confirmedTime)}
+            {formatPaymentTime(
+              paymentResult.confirmedTime
+            )}
           </p>
         </div>
       )}
