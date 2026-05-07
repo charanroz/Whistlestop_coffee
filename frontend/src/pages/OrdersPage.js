@@ -544,4 +544,4 @@ function OrdersPage() {
   );
 }
 
-export default OrdersPage.js;
+export default OrdersPage;
