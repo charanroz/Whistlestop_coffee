@@ -6,6 +6,18 @@ Customers choose their train, and their coffee is ready exactly when they arrive
 
 ---
 
+### 📝 Note on Initial Load Time
+
+When accessing the application for the first time, or after a period of inactivity, you may experience a slight delay (typically a few seconds) before the app responds. This is a normal and expected behavior caused by:
+
+1. **Cloud Server Cold Starts:** To optimize resources, the cloud hosting environment may put the server to "sleep" when idle. The first incoming request wakes the server up, which takes a moment.
+2. **Backend Initialization (Warm-up):** The Java (Spring Boot) backend requires an initial warm-up phase on the first request to establish database connection pools and load core classes into memory.
+3. **Initial Network Handshake:** The initial SSL/TLS handshake and DNS resolution add a slight overhead on the first connection, especially on mobile networks.
+
+**Please note:** This delay only occurs on the *initial* request. Once the application is awake and warmed up, all subsequent interactions, page navigations, and order processing will be fast and highly responsive.
+
+---
+
 ## Features
 
 - 🚆 **Live train arrivals** — real-time data from Network Rail via Confluent Kafka
