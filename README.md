@@ -17,6 +17,14 @@ Customers choose their train, and their coffee is ready exactly when they arrive
 
 ---
 
+## Staff Access
+
+To access the staff dashboard, use the following credentials:
+- **Username:** `admin@coffe.com`
+- **Password:** `1234`
+
+---
+
 ## Tech Stack
 
 | Layer | Technology |
