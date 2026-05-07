@@ -9,27 +9,47 @@ function SignupPage() {
 
   const navigate = useNavigate();
 
+  // create new customer account
   const handleSignup = async () => {
     try {
-      const res = await fetch(`${API}/api/customer/signup`,{
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ name, email, password })
-      });
+      // send signup request
+      const res = await fetch(
+        `${API}/api/customer/signup`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            name,
+            email,
+            password
+          })
+        }
+      );
 
       const data = await res.json();
 
+      // show error message if signup fails
       if (!data.success) {
         alert(data.message);
         return;
       }
 
-      localStorage.setItem("user", JSON.stringify({
-        id: data.customer.id,
-        name: data.customer.name,
-        role: "CUSTOMER"
-      }));
+      // save customer data in local storage
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          id: data.customer.id,
+          name: data.customer.name,
+          role: "CUSTOMER"
+        })
+      );
 
+      // redirect after signup
       navigate("/menu");
 
     } catch (err) {
@@ -40,45 +60,70 @@ function SignupPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f5f1eb]">
 
+      {/* Signup Box */}
       <div className="bg-white p-8 rounded-2xl shadow-xl w-[360px]">
 
         <h1 className="text-2xl font-bold text-center mb-6">
           Create Account
         </h1>
 
+        {/* Name Input */}
         <input
           placeholder="Full Name"
+
           value={name}
-          onChange={e => setName(e.target.value)}
+
+          onChange={e =>
+            setName(e.target.value)
+          }
+
           className="w-full p-3 border rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-[#6f4e37]"
         />
 
+        {/* Email Input */}
         <input
           placeholder="Email Address"
+
           value={email}
-          onChange={e => setEmail(e.target.value)}
+
+          onChange={e =>
+            setEmail(e.target.value)
+          }
+
           className="w-full p-3 border rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-[#6f4e37]"
         />
 
+        {/* Password Input */}
         <input
           type="password"
+
           placeholder="Password"
+
           value={password}
-          onChange={e => setPassword(e.target.value)}
+
+          onChange={e =>
+            setPassword(e.target.value)
+          }
+
           className="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-[#6f4e37]"
         />
 
+        {/* Signup Button */}
         <button
           onClick={handleSignup}
+
           className="w-full py-3 bg-[#6f4e37] text-white rounded-lg hover:bg-[#5a3d2b] transition"
         >
           Sign Up
         </button>
 
+        {/* Login Link */}
         <p className="text-center mt-4 text-sm text-gray-600">
           Already have an account?{" "}
+
           <span
             onClick={() => navigate("/")}
+
             className="text-blue-500 cursor-pointer hover:underline"
           >
             Login

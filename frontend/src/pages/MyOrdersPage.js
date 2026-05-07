@@ -4,11 +4,12 @@ import API from "../api";
 function MyOrdersPage() {
   const [orders, setOrders] = useState([]);
 
-  //  store user in state
+  // get logged in user from local storage
   const [user] = useState(() =>
     JSON.parse(localStorage.getItem("user") || "null")
   );
 
+  // fetch customer orders every 5 seconds
   useEffect(() => {
     if (!user) return;
 
@@ -21,100 +22,202 @@ function MyOrdersPage() {
 
     fetchOrders();
 
-    const interval = setInterval(fetchOrders, 5000); // slower
+    const interval = setInterval(
+      fetchOrders,
+      5000
+    );
 
     return () => clearInterval(interval);
+
   }, [user]);
 
+  // hide archived and mock orders
   const visibleOrders = orders.filter(order =>
     !order.archived &&
     !String(order.trainId || "").startsWith("MOCK-")
   );
 
+  // set different colors for each status
   const getStatusStyle = (status) => {
     switch (status) {
-      case "Pending": return { background: "#ffe0b2", color: "#e65100" };
-      case "Accepted": return { background: "#bbdefb", color: "#0d47a1" };
-      case "In Progress": return { background: "#e1bee7", color: "#4a148c" };
-      case "Ready for Collection": return { background: "#c8e6c9", color: "#1b5e20" };
-      case "Collected": return { background: "#eeeeee", color: "#424242" };
-      case "Cancelled": return { background: "#ffcdd2", color: "#b71c1c" };
-      default: return {};
+
+      case "Pending":
+        return {
+          background: "#ffe0b2",
+          color: "#e65100"
+        };
+
+      case "Accepted":
+        return {
+          background: "#bbdefb",
+          color: "#0d47a1"
+        };
+
+      case "In Progress":
+        return {
+          background: "#e1bee7",
+          color: "#4a148c"
+        };
+
+      case "Ready for Collection":
+        return {
+          background: "#c8e6c9",
+          color: "#1b5e20"
+        };
+
+      case "Collected":
+        return {
+          background: "#eeeeee",
+          color: "#424242"
+        };
+
+      case "Cancelled":
+        return {
+          background: "#ffcdd2",
+          color: "#b71c1c"
+        };
+
+      default:
+        return {};
     }
   };
 
-
+  // show message based on order status
   const getStatusMessage = (status) => {
     switch (status) {
-      case "Pending": return "Your order has been placed ☕";
-      case "Accepted": return "Barista accepted your order ";
-      case "In Progress": return "Your coffee is being prepared ";
-      case "Ready for Collection": return "Ready for pickup ";
-      case "Collected": return "Enjoy your coffee ";
-      case "Cancelled": return "Order cancelled ";
-      default: return "";
+
+      case "Pending":
+        return "Your order has been placed ☕";
+
+      case "Accepted":
+        return "Barista accepted your order";
+
+      case "In Progress":
+        return "Your coffee is being prepared";
+
+      case "Ready for Collection":
+        return "Ready for pickup";
+
+      case "Collected":
+        return "Enjoy your coffee";
+
+      case "Cancelled":
+        return "Order cancelled";
+
+      default:
+        return "";
     }
   };
 
+  // format pickup date and time
   const formatDisplayDateTime = (value) => {
     if (!value) return "";
+
     const [date, time] = value.split(" ");
+
     if (!time) return value;
+
     return `${time} (${date})`;
   };
 
   return (
-    <div style={{
-      padding: "20px",
-      background: "#f5f1eb",
-      minHeight: "100vh"
-    }}>
-      <h1 style={{ textAlign: "center" }}> My Orders</h1>
+    <div
+      style={{
+        padding: "20px",
+        background: "#f5f1eb",
+        minHeight: "100vh"
+      }}
+    >
 
+      {/* Page Title */}
+      <h1 style={{ textAlign: "center" }}>
+        My Orders
+      </h1>
+
+      {/* Show login message */}
       {!user && (
-        <p style={{ textAlign: "center", color: "red" }}>
+        <p
+          style={{
+            textAlign: "center",
+            color: "red"
+          }}
+        >
           Please login to view your orders
         </p>
       )}
 
+      {/* Show empty order message */}
       {user && visibleOrders.length === 0 && (
-        <p style={{ textAlign: "center" }}>No orders yet</p>
+        <p style={{ textAlign: "center" }}>
+          No orders yet
+        </p>
       )}
 
+      {/* Order Cards */}
       {visibleOrders.map(order => (
-        <div key={order.id} style={{
-          background: "white",
-          padding: "20px",
-          margin: "20px auto",
-          borderRadius: "20px",
-          width: "350px",
-          boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
-          border:
-            order.status === "Ready for Collection"
-              ? "3px solid green"
-              : "none"
-        }}>
+        <div
+          key={order.id}
+
+          style={{
+            background: "white",
+            padding: "20px",
+            margin: "20px auto",
+            borderRadius: "20px",
+            width: "350px",
+            boxShadow:
+              "0 6px 20px rgba(0,0,0,0.1)",
+
+            border:
+              order.status ===
+              "Ready for Collection"
+                ? "3px solid green"
+                : "none"
+          }}
+        >
+
           <h3>Order #{order.id}</h3>
 
-          <div style={{
-            ...getStatusStyle(order.status),
-            padding: "6px 12px",
-            borderRadius: "20px",
-            display: "inline-block",
-            fontWeight: "bold",
-            marginBottom: "10px"
-          }}>
+          {/* Order Status */}
+          <div
+            style={{
+              ...getStatusStyle(order.status),
+              padding: "6px 12px",
+              borderRadius: "20px",
+              display: "inline-block",
+              fontWeight: "bold",
+              marginBottom: "10px"
+            }}
+          >
             {order.status}
           </div>
 
-          <p>{getStatusMessage(order.status)}</p>
+          {/* Status Message */}
+          <p>
+            {getStatusMessage(order.status)}
+          </p>
 
-          <p><strong>Pickup:</strong> {formatDisplayDateTime(order.pickupTime)}</p>
+          {/* Pickup Time */}
+          <p>
+            <strong>Pickup:</strong>{" "}
+            {formatDisplayDateTime(
+              order.pickupTime
+            )}
+          </p>
+
+          {/* Train Details */}
           {order.trainId && (
-            <p style={{ color: "#e65100", fontWeight: "bold" }}>
+            <p
+              style={{
+                color: "#e65100",
+                fontWeight: "bold"
+              }}
+            >
               🚆 Train: {order.trainId}
+
               <br />
-              ⏳ Est. Arrival: {order.estimatedArrivalTime}
+
+              ⏳ Est. Arrival:{" "}
+              {order.estimatedArrivalTime}
             </p>
           )}
         </div>

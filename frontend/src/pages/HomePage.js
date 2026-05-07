@@ -4,23 +4,32 @@ function HomePage() {
   const navigate = useNavigate();
 
   return (
-    <div style={{
-      height: "100vh",
-      background: "#6f4e37",
-      color: "white",
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "center"
-    }}>
-      <h1 style={{ fontSize: "40px" }}>☕ Whistlestop Coffee</h1>
+    <div
+      style={{
+        height: "100vh",
+        background: "#6f4e37",
+        color: "white",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center"
+      }}
+    >
 
+      {/* App Title */}
+      <h1 style={{ fontSize: "40px" }}>
+        ☕ Whistlestop Coffee
+      </h1>
+
+      {/* Welcome Message */}
       <p style={{ marginTop: "10px" }}>
         Tap to start your order
       </p>
 
+      {/* Start Button */}
       <button
         onClick={() => navigate("/login")}
+
         style={{
           marginTop: "40px",
           padding: "20px 40px",
