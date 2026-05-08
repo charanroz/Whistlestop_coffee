@@ -36,7 +36,7 @@ public class PaymentController {
                     "SUCCESS"
             );
 
-            //  DTO to frontend
+            //  DTO transfers to frontend
             return ResponseEntity.ok(responseDto);
 
         } catch (IllegalArgumentException e) {

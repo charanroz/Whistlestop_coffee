@@ -253,6 +253,7 @@ public class OrderManager {
         /*
         There are two situation which staff can cancel the orders.
         1. Customers miss their picking up time more than 15 minutes.
+            (staff must wait 15 minutes before cancel the order)
         2. The goods are out of stock.
          */
 
