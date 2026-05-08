@@ -249,6 +249,13 @@ public class OrderManager {
 
         order.setStatus("Cancelled");
         order.setCancelReason(reason);
+
+        /*
+        There are two situation which staff can cancel the orders.
+        1. Customers miss their pick up time more than 15 minutes.
+        2. The goods are out of stock.
+         */
+
         //confirm customer is late more than 15mins
         if ("CUSTOMER_LATE".equals(reason)) {
             try {
